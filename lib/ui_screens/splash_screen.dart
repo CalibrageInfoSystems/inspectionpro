@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:inspectionpro/ui_screens/LoginScreen.dart';
+import 'package:inspectionpro/ui_screens/login_screen.dart';
 import 'package:inspectionpro/ui_screens/MainScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'database/InspDatabaseHelper.dart';
-
+import '../database/InspDatabaseHelper.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -38,7 +37,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => isLogin ? MainScreen() : LoginScreen()),
+      MaterialPageRoute(
+          builder: (context) => isLogin ? MainScreen() : LoginScreen()),
     );
   }
 

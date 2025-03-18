@@ -49,7 +49,8 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
         backgroundColor: HexColor.fromHex('#272A33'),
         // Set background color // Set your desired background color here
-        body: Center(
+        body:
+        Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: Column(

@@ -1,9 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:inspectionpro/models/appinfo_model.dart';
 import 'package:inspectionpro/ui_screens/failed_pipeline.dart';
 import 'package:inspectionpro/utils/api_config.dart';
 import 'package:http/http.dart' as http;
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:sqflite/sqflite.dart';
+
+import '../database/InspDatabaseHelper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,18 +20,38 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  Future<AppInfo> getAppInfo() async {
+  List<Map<String, dynamic>> lines = [];
+  List<Map<String, dynamic>> units = [];
+  List<Map<String, dynamic>> lineValues = [];
+  String? selectedUnit;
+  List<dynamic> selectedLineValues = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+  Future<void> getAppInfo() async {
     try {
       final apiUrl = Uri.parse('$baseUrl$getLines');
       final jsonResponse = await http.get(apiUrl);
+
       if (jsonResponse.statusCode == 200) {
-        return appInfoFromJson(jsonResponse.body);
+        Map<String, dynamic> data = jsonDecode(jsonResponse.body);
+
+        final dbHelper = InspDatabaseHelper();
+
+        await dbHelper.insertLines(data['lines']);
+        await dbHelper.insertLineValues(data['values']);
+        await dbHelper.insertOperators(data['operators']);
+
+        Fluttertoast.showToast(msg: "Data saved successfully!");
       } else {
         Fluttertoast.showToast(msg: jsonResponse.body);
         throw Exception(jsonResponse.body);
       }
     } catch (e) {
-      rethrow;
+      Fluttertoast.showToast(msg: "Error: ${e.toString()}");
     }
   }
 
@@ -91,19 +118,55 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              child: ListView(
-                children: [
-                  buildItem(),
-                  buildItem(),
-                  buildItem(),
-                  /* _buildListItem('Phyce Line', '03/17/2025 10:04', 'Failed'),
-                  _buildListItem('Wheat Line', '03/17/2025 12:32', 'Passed'),
-                  _buildListItem('Dry Line', '03/14/2025 12:32', 'Passed'),
-                  _buildListItem(
-                      'Clothes Line', '03/14/2025 12:32', 'Passed'), */
-                ],
+              child: lines.isEmpty
+                  ? Center(child: Text("No data found"))
+                  : ListView.builder(
+                itemCount: lines.length,
+                itemBuilder: (context, index) {
+                  return buildItem(lines[index]); // Pass data to `buildItem`
+                },
               ),
             ),
+
+            /// **🔹 Units Dropdown**
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: DropdownButton<String>(
+                isExpanded: true,
+                value: selectedUnit,
+                hint: Text("Select Unit"),
+                items: units.map((unit) {
+                  return DropdownMenuItem<String>(
+                    value: unit['name'],
+                    child: Text(unit['name']),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedUnit = value;
+                  });
+                },
+              ),
+            ),
+
+
+    Padding(
+    padding: EdgeInsets.all(10),
+    child: MultiSelectDialogField(
+    items: lineValues.map((value) {
+    return MultiSelectItem(value['name'], value['name']);
+    }).toList(),
+    title: Text("Select Line Values"),
+    buttonText: Text("Choose Line Values"),
+    initialValue: selectedLineValues,
+    onConfirm: (values) {
+    setState(() {
+    selectedLineValues = values;
+    });
+    },
+    ),
+    ),
+
           ],
         ),
       ),
@@ -128,45 +191,55 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildItem() {
+  /// **UI for Each Line Item**
+  Widget buildItem(Map<String, dynamic> line) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: Colors.grey,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey)),
       ),
       child: Row(
         children: [
-          const Column(
+          /// **Line Name & Last Executed Time**
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Phyce Line'),
-              SizedBox(height: 5),
-              Text('03/17/2025 10:04       Passed'),
+              Text(
+                line['name'],
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                "${line['lastExecuted']}   ${line['status'] == 1 ? "Passed" : "Failed"}",
+                style: TextStyle(color: Colors.black54),
+              ),
             ],
           ),
+
           const Spacer(),
+
+          /// **Thumbs Up & Down Buttons**
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              print("Approved: ${line['name']}");
+            },
             style: IconButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4)),
-                side: const BorderSide(
-                  color: Colors.green,
-                )),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4)),
+              side: const BorderSide(color: Colors.green),
+            ),
             icon: const Icon(Icons.thumb_up, color: Colors.green, size: 20),
           ),
+
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              print("Rejected: ${line['name']}");
+            },
             style: IconButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4)),
-                side: const BorderSide(
-                  color: Colors.red,
-                )),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4)),
+              side: const BorderSide(color: Colors.red),
+            ),
             icon: const Icon(Icons.thumb_down, color: Colors.red, size: 20),
           ),
         ],
@@ -174,20 +247,19 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildListItem(String title, String date, String status) {
-    Color statusColor = status == 'Failed' ? Colors.red : Colors.green;
-    return ListTile(
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(date),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(status, style: TextStyle(color: statusColor)),
-          const SizedBox(width: 8),
-          const Icon(Icons.thumb_up, color: Colors.green, size: 20),
-          const Icon(Icons.thumb_down, color: Colors.red, size: 20),
-        ],
-      ),
-    );
+
+  /// Fetch Data from SQLite
+  Future<void> fetchData() async {
+    final dbHelper = InspDatabaseHelper();
+
+    List<Map<String, dynamic>> fetchedLines = await dbHelper.getLines();
+    List<Map<String, dynamic>> fetchedUnits = await dbHelper.getUnits();
+    List<Map<String, dynamic>> fetchedLineValues = await dbHelper.getLineValues();
+
+    setState(() {
+      lines = fetchedLines;
+      units = fetchedUnits;
+      lineValues = fetchedLineValues;
+    });
   }
 }

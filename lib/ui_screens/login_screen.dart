@@ -5,10 +5,13 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:inspectionpro/ui_screens/home_screen.dart';
+import 'package:inspectionpro/ui_screens/splash_screen.dart';
 import 'package:inspectionpro/utils/api_config.dart';
 import 'package:inspectionpro/utils/commonutils.dart';
 import 'package:inspectionpro/widgets/custom_textfield.dart';
 import 'package:http/http.dart' as http;
+
+import '../gen/assets.gen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -99,34 +102,57 @@ class _LoginScreenState extends State<LoginScreen> {
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white.withOpacity(0.1),
+                            //   color: Colors.white.withOpacity(0.1),
                           ),
                           padding: const EdgeInsets.all(8.0),
-                          child: const Icon(
-                            Icons.check_circle,
-                            color: Colors.green,
-                            size: 40,
+                          child: Image.asset(
+                            Assets.images.appLogo512.path,
+                            // 'assets/app_logo_512.png',
+                            // Load logo from drawable (assets)
+                            width: 60,
+                            height: 60,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'InspectionPro',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 40,
+                        RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Inspection',
+                                style: TextStyle(
+                                  color: HexColor.fromHex('#f5f5f5'),
+                                  fontSize: 35,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Pro',
+                                style: TextStyle(
+                                  color: Colors.grey[400],
+                                  fontSize: 35,
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: 'Roboto',
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      'INSPECTION MANAGEMENT',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                        letterSpacing: 1.2,
+                    Center(
+                      child: Text(
+                        'INSPECTION MANAGEMENT',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 20,
+                          letterSpacing: 0.2,
+                          fontWeight: FontWeight.w100,
+                          fontFamily: 'Roboto',
+                        ),
                       ),
                     ),
+
                     const SizedBox(height: 48),
                     Align(
                       alignment: Alignment.centerLeft,

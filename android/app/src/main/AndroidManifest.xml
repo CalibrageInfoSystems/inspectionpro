@@ -2,7 +2,7 @@
     <application
         android:label="Inspection Pro"
         android:name="${applicationName}"
-        android:icon="@drawable/app_logo_512">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

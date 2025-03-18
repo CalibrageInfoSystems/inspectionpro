@@ -1,4 +1,4 @@
-package calib.inspectionpro.app.inspectionpro;
+package app.calibrage.inspectionpro;
 
 import io.flutter.embedding.android.FlutterActivity;
 

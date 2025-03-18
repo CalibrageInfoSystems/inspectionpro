@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:inspectionpro/models/appinfo_model.dart';
+import 'package:inspectionpro/ui_screens/failed_pipeline.dart';
 import 'package:inspectionpro/utils/api_config.dart';
 import 'package:http/http.dart' as http;
 
@@ -42,7 +43,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const Spacer(),
             IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const FailedPipeline()),
+                  );
+                },
                 icon: const Icon(
                   Icons.sync_lock_outlined,
                   color: Colors.white,

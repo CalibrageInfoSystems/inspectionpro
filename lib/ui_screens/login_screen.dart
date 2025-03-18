@@ -37,6 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
         Fluttertoast.showToast(
             msg: 'No internet connection, Please try again.');
         FocusScope.of(context).unfocus();
+        Navigator.of(context).pop();
         return;
       }
       const apiUrl = '$baseUrl$login';
@@ -56,6 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
         body: requestBody,
       );
 
+      Navigator.of(context).pop();
       if (jsonResponse.statusCode == 200) {
         Navigator.pushReplacement(
           context,
@@ -65,9 +67,9 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         Fluttertoast.showToast(msg: jsonResponse.body);
-        throw Exception(jsonResponse.body);
       }
     } catch (e) {
+      Navigator.of(context).pop();
       rethrow;
     }
   }
@@ -77,92 +79,107 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF212121),
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Logo and Title Section
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withOpacity(0.1),
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Logo and Title Section
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.1),
+                          ),
+                          padding: const EdgeInsets.all(8.0),
+                          child: const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 40,
+                          ),
                         ),
-                        padding: const EdgeInsets.all(8.0),
-                        child: const Icon(
-                          Icons.check_circle,
-                          color: Colors.green,
-                          size: 40,
+                        const SizedBox(width: 10),
+                        const Text(
+                          'InspectionPro',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 40,
+                          ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'INSPECTION MANAGEMENT',
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontSize: 14,
+                        letterSpacing: 1.2,
                       ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        'InspectionPro',
+                    ),
+                    const SizedBox(height: 48),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'USER ID',
                         style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 40,
+                          color: Colors.grey[400],
+                          fontSize: 14,
+                          letterSpacing: 1.2,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'INSPECTION MANAGEMENT',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14,
-                      letterSpacing: 1.2,
                     ),
-                  ),
-                  const SizedBox(height: 48),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'USER ID',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                        letterSpacing: 1.2,
+                    const SizedBox(height: 8),
+                    CustomTextfield(
+                      controller: userIdController,
+                      hintText: 'Enter User ID',
+                      validator: userIdValidator,
+                    ),
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'PASSWORD',
+                        style: TextStyle(
+                          color: Colors.grey[400],
+                          fontSize: 14,
+                          letterSpacing: 1.2,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  CustomTextfield(
-                    controller: userIdController,
-                    hintText: 'Enter User ID',
-                    validator: userIdValidator,
-                  ),
-                  const SizedBox(height: 16),
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      'PASSWORD',
-                      style: TextStyle(
-                        color: Colors.grey[400],
-                        fontSize: 14,
-                        letterSpacing: 1.2,
-                      ),
+                    const SizedBox(height: 8),
+                    CustomTextfield(
+                      controller: passwordController,
+                      hintText: 'Enter Password',
+                      obscureText: true,
+                      validator: passwordValidator,
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  CustomTextfield(
-                    controller: passwordController,
-                    hintText: 'Enter Password',
-                    obscureText: true,
-                    validator: passwordValidator,
-                  ),
-                  const SizedBox(height: 30),
-                  rememberMeCheckBox(),
-                  const SizedBox(height: 20),
-                  signinBtn(),
-                ],
+                    const SizedBox(height: 30),
+                    rememberMeCheckBox(),
+                    const SizedBox(height: 20),
+                    signinBtn(),
+                    /*  const SizedBox(height: 10),
+                    ElevatedButton(
+                      onPressed: () {
+                        showLoadingDialog(context);
+                        Future.delayed(Duration(seconds: 2), () {
+                          Navigator.of(context).pop();
+                        });
+                      },
+                      child: Text('Show Loading'),
+                    ), */
+                  ],
+                ),
               ),
             ),
           ),
@@ -178,6 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: ElevatedButton(
         onPressed: () {
           if (formKey.currentState!.validate()) {
+            CommonUtils.showLoadingDialog(context);
             signin();
           }
         },

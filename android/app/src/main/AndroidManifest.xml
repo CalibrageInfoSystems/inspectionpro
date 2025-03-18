@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="inspectionpro"
+        android:label="Inspection Pro"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@drawable/app_logo_512">
         <activity
             android:name=".MainActivity"
             android:exported="true"

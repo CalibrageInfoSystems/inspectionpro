@@ -60,6 +60,7 @@ flutter:
   assets:
     - assets/inspection.sqlite
     - assets/fonts/
+    - assets/app_logo_512.png
     
   fonts:
     - family: Roboto

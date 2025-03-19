@@ -10,6 +10,7 @@ import 'package:inspectionpro/utils/api_config.dart';
 import 'package:inspectionpro/utils/commonutils.dart';
 import 'package:inspectionpro/widgets/custom_textfield.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../gen/assets.gen.dart';
 
@@ -37,14 +38,13 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       bool isConnected = await CommonUtils.checkInternetConnectivity();
       if (!isConnected) {
-        Fluttertoast.showToast(
-            msg: 'No internet connection, Please try again.');
+        Fluttertoast.showToast(msg: 'No internet connection, Please try again.');
         FocusScope.of(context).unfocus();
         Navigator.of(context).pop();
         return;
       }
+
       const apiUrl = '$baseUrl$login';
-      // 'http://inspectionpro.calibrage.us/api/ProApp/Login';
 
       final requestBody = jsonEncode({
         "UserName": userIdController.text,
@@ -62,11 +62,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.of(context).pop();
       if (jsonResponse.statusCode == 200) {
+        Map<String, dynamic> responseData = jsonDecode(jsonResponse.body);
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('UserName', responseData['UserName']);
+        await prefs.setString('ApplicationName', responseData['ApplicationName']);
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => const HomeScreen(),
-          ),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       } else {
         Fluttertoast.showToast(msg: jsonResponse.body);
@@ -142,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 8),
                     Center(
                       child: Text(
-                        'INSPECTION MANAGEMENT',
+                        '  INSPECTION MANAGEMENT',
                         style: TextStyle(
                           color: Colors.grey[400],
                           fontSize: 20,

@@ -35,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _checkLoginStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool isLogin = prefs.getBool("isLogin") ?? false;
+    bool isLogin = prefs.getBool("isLoggedIn") ?? false;
 
     Navigator.pushReplacement(
       context,
@@ -62,15 +62,10 @@ class _SplashScreenState extends State<SplashScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        //   color: Colors.white.withOpacity(0.1),
-                      ),
+                      decoration: BoxDecoration(shape: BoxShape.circle),
                       padding: const EdgeInsets.all(8.0),
                       child: Image.asset(
-                        Assets.images.appLogo512.path,
-                        // 'assets/app_logo_512.png',
-                        // Load logo from drawable (assets)
+                        Assets.images.appLogo512.path,// Load from assets
                         width: 60,
                         height: 60,
                       ),
@@ -101,10 +96,11 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 8),
                 Center(
                   child: Text(
-                    'INSPECTION MANAGEMENT',
+                    '  INSPECTION MANAGEMENT',
                     style: TextStyle(
                       color: Colors.grey[400],
                       fontSize: 20,

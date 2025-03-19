@@ -6,25 +6,24 @@ import 'package:inspectionpro/database/InspDatabaseHelper.dart';
 import 'package:inspectionpro/widgets/custom_button.dart';
 import 'package:inspectionpro/widgets/custom_textfield.dart';
 
+// class RejectPipeline extends StatefulWidget {
+//   const RejectPipeline({super.key});
+//
+//   @override
+//   State<RejectPipeline> createState() => _RejectPipelineState();
+// }
+
 class RejectPipeline extends StatefulWidget {
-  const RejectPipeline({super.key});
+  final String lineId;
+  final String name;
+
+  const RejectPipeline({super.key, required this.lineId, required this.name});
 
   @override
-  State<RejectPipeline> createState() => _RejectPipelineState();
+  _RejectPipelineState createState() => _RejectPipelineState();
 }
 
 class _RejectPipelineState extends State<RejectPipeline> {
-  final List<String> daysOfWeek = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday"
-  ];
-  String? selectedDay;
-
   List<String> options = [
     'Re-sanitize',
     'Scrub',
@@ -34,22 +33,23 @@ class _RejectPipelineState extends State<RejectPipeline> {
     'Re-rinse, re-sanitize, re-inspect',
     'Re-rinse',
   ];
-  // List<bool> isChecked = List.filled(7, false);
-  List<bool> isChecked = [];
+
+  List<bool> isChecked = []; // Correctly initialized
   List<Map<String, dynamic>> selectedItems = [];
 
   late Future<List<Map<String, dynamic>>> futureUnits;
   late Future<List<Map<String, dynamic>>> futureLines;
   late Future<List<Map<String, dynamic>>> futureLineValues;
+
   String? selectedDdUnit;
   String? selectedDdOperator;
-
   @override
   void initState() {
     super.initState();
     futureUnits = fetchUnits();
     futureLines = fetchLine();
     futureLineValues = fetchLineValues();
+    print("Received LineID: ${widget.lineId}, Name: ${widget.name}");
   }
 
 /*   Future<List<Future>> fetchFutureData() async {
@@ -72,13 +72,14 @@ class _RejectPipelineState extends State<RejectPipeline> {
   Future<List<Map<String, dynamic>>> fetchUnits() async {
     try {
       final dbHelper = InspDatabaseHelper();
-      final result = await dbHelper.getUnits();
+      final result = await dbHelper.getUnits(widget.lineId); // Pass lineId
       print('fetchUnits: ${jsonEncode(result)}');
       return result;
     } catch (e) {
       rethrow;
     }
   }
+
 
   Future<List<Map<String, dynamic>>> fetchLine() async {
     try {

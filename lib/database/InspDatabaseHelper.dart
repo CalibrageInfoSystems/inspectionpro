@@ -6,9 +6,6 @@ import 'package:sqflite/sqflite.dart';
 
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/services.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 
 class InspDatabaseHelper {
   static const String _databaseName = "inspection.sqlite";
@@ -170,12 +167,15 @@ class InspDatabaseHelper {
   }
 
   /// Fetch Units Data
-  Future<List<Map<String, dynamic>>> getUnits() async {
+  Future<List<Map<String, dynamic>>> getUnits(String lineId) async {
     final db = await database;
-    return await db.query('units');
+    return await db.query(
+      'units',
+      where: 'lineId = ?',
+      whereArgs: [lineId],
+    );
   }
 
-  /// Fetch Line Values Data
   Future<List<Map<String, dynamic>>> getLineValues() async {
     final db = await database;
     return await db.query('linevalues');
@@ -280,7 +280,44 @@ class InspDatabaseHelper {
       print("❌ Error fetching data from $tableName: $e");
     }
   }
+
+  /// **Update Status Query**
+  Future<void> updateStatus(int status, String lineId) async {
+    final db = await database;
+
+    // Print the raw SQL query for debugging
+    String query = "UPDATE lines SET status = $status WHERE lineId = '$lineId'";
+    print("📝 Executing Query: $query");
+
+    // Execute the update query
+    int rowsAffected = await db.rawUpdate(
+      "UPDATE lines SET status = ? WHERE lineId = ?",
+      [status, lineId],
+    );
+
+    // Check if update was successful
+    if (rowsAffected > 0) {
+      print("✅ Status updated successfully for lineId: $lineId ($rowsAffected rows affected)");
+    } else {
+      print("❌ Update failed. Check if lineId exists.");
+      await debugTableContents();
+    }
+  }
+
+
+
+  /// **🔍 Debugging: Fetch and Print All Rows in 'lines' Table**
+  Future<void> debugTableContents() async {
+    final db = await database;
+    List<Map<String, dynamic>> rows = await db.query("lines");
+
+    print("📊 Current 'lines' Table Data:");
+    for (var row in rows) {
+      print(row);
+    }
+  }
 }
+
 
   /// **Insert Methods for Specific Tables with Print Statements**
   //

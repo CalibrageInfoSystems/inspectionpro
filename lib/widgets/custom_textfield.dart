@@ -3,22 +3,26 @@ import 'package:flutter/material.dart';
 class CustomTextfield extends StatelessWidget {
   final bool? filled;
   final Color? fillColor;
-  final String hintText;
+  final String? hintText;
   final TextEditingController? controller;
   final bool obscureText;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
   final FocusNode? focusNode;
+  final Color? focusBorderColor;
+  final int? maxLines;
 
   const CustomTextfield({
     super.key,
     this.filled = true,
     this.obscureText = false,
     this.fillColor = Colors.white,
-    required this.hintText,
+    this.focusBorderColor,
+    this.hintText,
     this.controller,
     this.validator,
     this.onChanged,
+    this.maxLines = 1,
     this.focusNode,
   });
 
@@ -30,6 +34,7 @@ class CustomTextfield extends StatelessWidget {
       onChanged: onChanged,
       focusNode: focusNode,
       validator: validator,
+      maxLines: maxLines,
       decoration: InputDecoration(
           filled: filled,
           fillColor: fillColor,
@@ -45,7 +50,7 @@ class CustomTextfield extends StatelessWidget {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
-            borderSide: const BorderSide(color: Colors.blue),
+            borderSide: BorderSide(color: focusBorderColor ?? Colors.blue),
           )),
     );
   }

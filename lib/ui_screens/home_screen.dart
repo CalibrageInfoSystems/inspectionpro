@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:inspectionpro/models/appinfo_model.dart';
-import 'package:inspectionpro/ui_screens/failed_pipeline.dart';
+import 'package:inspectionpro/ui_screens/reject_pipeline.dart';
 import 'package:inspectionpro/utils/api_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     fetchData();
   }
+
   Future<void> getAppInfo() async {
     try {
       final apiUrl = Uri.parse('$baseUrl$getLines');
@@ -70,13 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const Spacer(),
             IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const FailedPipeline()),
-                  );
-                },
+                onPressed: () {},
                 icon: const Icon(
                   Icons.sync_lock_outlined,
                   color: Colors.white,
@@ -121,11 +116,12 @@ class _HomeScreenState extends State<HomeScreen> {
               child: lines.isEmpty
                   ? Center(child: Text("No data found"))
                   : ListView.builder(
-                itemCount: lines.length,
-                itemBuilder: (context, index) {
-                  return buildItem(lines[index]); // Pass data to `buildItem`
-                },
-              ),
+                      itemCount: lines.length,
+                      itemBuilder: (context, index) {
+                        return buildItem(
+                            lines[index]); // Pass data to `buildItem`
+                      },
+                    ),
             ),
 
             /// **🔹 Units Dropdown**
@@ -149,24 +145,22 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-
-    Padding(
-    padding: EdgeInsets.all(10),
-    child: MultiSelectDialogField(
-    items: lineValues.map((value) {
-    return MultiSelectItem(value['name'], value['name']);
-    }).toList(),
-    title: Text("Select Line Values"),
-    buttonText: Text("Choose Line Values"),
-    initialValue: selectedLineValues,
-    onConfirm: (values) {
-    setState(() {
-    selectedLineValues = values;
-    });
-    },
-    ),
-    ),
-
+            Padding(
+              padding: EdgeInsets.all(10),
+              child: MultiSelectDialogField(
+                items: lineValues.map((value) {
+                  return MultiSelectItem(value['name'], value['name']);
+                }).toList(),
+                title: Text("Select Line Values"),
+                buttonText: Text("Choose Line Values"),
+                initialValue: selectedLineValues,
+                onConfirm: (values) {
+                  setState(() {
+                    selectedLineValues = values;
+                  });
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -191,8 +185,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  String convertDate(String dateStr) {
+    DateTime date = DateTime.parse(dateStr);
+    return "${date.month}/${date.day}/${date.year} ${date.hour}:${date.minute}";
+  }
+
   /// **UI for Each Line Item**
   Widget buildItem(Map<String, dynamic> line) {
+    print('www: ${line['lastExecuted']}');
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(
@@ -209,10 +209,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               const SizedBox(height: 5),
-              Text(
-                "${line['lastExecuted']}   ${line['status'] == 1 ? "Passed" : "Failed"}",
-                style: TextStyle(color: Colors.black54),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: "${convertDate(line['lastExecuted'])}   ",
+                      style: TextStyle(color: Colors.black54),
+                    ),
+                    TextSpan(
+                      text: line['status'] == 1 ? "Passed" : "Failed",
+                      style: TextStyle(
+                        color:
+                            line['status'] == 1 ? Colors.black54 : Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
               ),
+
+              /* Text(
+                "${convertDate(line['lastExecuted'])}   ${line['status'] == 1 ? "Passed" : "Failed"}",
+                style: TextStyle(
+                    color: line['status'] == 1 ? Colors.black54 : Colors.red),
+              ), */
             ],
           ),
 
@@ -234,6 +253,10 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             onPressed: () {
               print("Rejected: ${line['name']}");
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const RejectPipeline()),
+              );
             },
             style: IconButton.styleFrom(
               shape: RoundedRectangleBorder(
@@ -247,14 +270,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   /// Fetch Data from SQLite
   Future<void> fetchData() async {
     final dbHelper = InspDatabaseHelper();
 
     List<Map<String, dynamic>> fetchedLines = await dbHelper.getLines();
     List<Map<String, dynamic>> fetchedUnits = await dbHelper.getUnits();
-    List<Map<String, dynamic>> fetchedLineValues = await dbHelper.getLineValues();
+    List<Map<String, dynamic>> fetchedLineValues =
+        await dbHelper.getLineValues();
 
     setState(() {
       lines = fetchedLines;

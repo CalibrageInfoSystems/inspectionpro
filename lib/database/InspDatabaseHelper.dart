@@ -165,6 +165,10 @@ class InspDatabaseHelper {
     final db = await database;
     return await db.query('lines');
   }
+  Future<List<Map<String, dynamic>>> getoperators() async {
+    final db = await database;
+    return await db.query('operators');
+  }
 
   /// Fetch Units Data
   Future<List<Map<String, dynamic>>> getUnits(String lineId) async {
@@ -176,10 +180,15 @@ class InspDatabaseHelper {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getLineValues() async {
+  Future<List<Map<String, dynamic>>> getLineValues(int isInspection) async {
     final db = await database;
-    return await db.query('linevalues');
+    return await db.query(
+      'linevalues',
+      where: 'isInspection = ?',
+      whereArgs: [isInspection],
+    );
   }
+
 
   /// **Clear Table Data Before Inserting New Records**
   Future<void> clearTable(String tableName) async {

@@ -235,13 +235,30 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Text(
                 line['name'],
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,fontFamily: 'roboto'),
               ),
               const SizedBox(height: 5),
-              Text(
-                "${formattedDate}   ${line['status'] == 1 ? "Passed" : "Failed"}",
-                style: TextStyle(color: Colors.black54),
-              ),
+              RichText(
+                text: TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '$formattedDate   ',
+                      style: TextStyle(
+                        color: Colors.black54,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+                    TextSpan(
+                      text: line['status'] == 1 ? 'Passed' : 'Failed',
+                      style: TextStyle(
+                        color: line['status'] == 1 ? Colors.black54 : Colors.red,
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+                  ],
+                ),
+              )
+
             ],
           ),
 
@@ -301,7 +318,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
       List<Map<String, dynamic>> fetchedLines = await dbHelper.getLines();
     // ..  List<Map<String, dynamic>> fetchedUnits = await dbHelper.getUnits();
-      List<Map<String, dynamic>> fetchedLineValues = await dbHelper.getLineValues();
+   //   List<Map<String, dynamic>> fetchedLineValues = await dbHelper.getLineValues();
 
       List<Map<String, dynamic>> failedLines = fetchedLines.where((line) {
         return line['status'] == 0; // Assuming 'status' is a boolean
@@ -310,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         lines = fetchedLines;
         // units = fetchedUnits;
-        lineValues = fetchedLineValues;
+     //   lineValues = fetchedLineValues;
         failedLinesData = failedLines;
         isLoading = false; // Data loaded, hide loader
       });
@@ -378,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   color: HexColor.fromHex('#33AADD'), // Text Color Fixed
-                  fontFamily: 'Outfit',
+                  fontFamily: 'roboto',
                 ),
               ),
             ),
@@ -404,7 +421,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white, // White text
-                  fontFamily: 'Outfit',
+                  fontFamily: 'roboto',
                 ),
               ),
             ),

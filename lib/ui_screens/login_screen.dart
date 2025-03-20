@@ -30,10 +30,10 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    userIdController.text = 'demo';
-    passwordController.text = 'demo@123';
+    loadSavedCredentials();
+    // userIdController.text = 'demo';
+    // passwordController.text = 'demo@123';
   }
-
   Future<void> signin() async {
     try {
       bool isConnected = await CommonUtils.checkInternetConnectivity();
@@ -69,6 +69,18 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setString('UserName', responseData['UserName']);
         await prefs.setString('ApplicationName', responseData['ApplicationName']);
 
+        // Save credentials if "Remember Me" is checked
+        if (rememberMeChecked) {
+          await prefs.setBool('RememberMe', true);
+          await prefs.setString('SavedUserName', userIdController.text);
+          await prefs.setString('SavedPassword', passwordController.text);
+        } else {
+          // Clear saved credentials if "Remember Me" is not checked
+          await prefs.remove('RememberMe');
+          await prefs.remove('SavedUserName');
+          await prefs.remove('SavedPassword');
+        }
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -82,10 +94,35 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+//Call this method when initializing the login screen to pre-fill credentials
+//   Future<void> loadSavedCredentials() async {
+//     SharedPreferences prefs = await SharedPreferences.getInstance();
+//     bool rememberMe = prefs.getBool('RememberMe') ?? false;
+//
+//     if (rememberMe) {
+//       userIdController.text = prefs.getString('SavedUserName') ?? '';
+//       passwordController.text = prefs.getString('SavedPassword') ?? '';
+//       rememberMeChecked = rememberMe;
+//     }
+//   }
+  Future<void> loadSavedCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool rememberMe = prefs.getBool('RememberMe') ?? false;
+print('rememberMe: $rememberMe');
+    if (rememberMe) {
+      setState(() {
+        userIdController.text = prefs.getString('SavedUserName') ?? '';
+        passwordController.text = prefs.getString('SavedPassword') ?? '';
+        rememberMeChecked = rememberMe;
+      });
+    }
+ }
+
   @override
   Widget build(BuildContext context) {
+   // #272A33
     return Scaffold(
-      backgroundColor: const Color(0xFF212121),
+      backgroundColor: const Color(0xFF272A33),
       body: SafeArea(
         child: GestureDetector(
           onTap: () {
@@ -111,54 +148,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           padding: const EdgeInsets.all(8.0),
                           child: Image.asset(
-                            Assets.images.appLogo512.path,
+                            Assets.images.mainLogo.path,
                             // 'assets/app_logo_512.png',
                             // Load logo from drawable (assets)
-                            width: 60,
-                            height: 60,
+
                           ),
                         ),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Inspection',
-                                style: TextStyle(
-                                  color: HexColor.fromHex('#f5f5f5'),
-                                  fontSize: 35,
-                                  fontFamily: 'Roboto',
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'Pro',
-                                style: TextStyle(
-                                  color: Colors.grey[400],
-                                  fontSize: 35,
-                                  fontWeight: FontWeight.w400,
-                                  fontFamily: 'Roboto',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Center(
-                      child: Text(
-                        '  INSPECTION MANAGEMENT',
-                        style: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 20,
-                          letterSpacing: 0.2,
-                          fontWeight: FontWeight.w100,
-                          fontFamily: 'Roboto',
-                        ),
-                      ),
-                    ),
 
-                    const SizedBox(height: 48),
+
+                    const SizedBox(height: 40),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -254,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          rememberMeChecked = !rememberMeChecked;
+          rememberMeChecked = !rememberMeChecked; // Toggle value
         });
       },
       child: Row(
@@ -287,6 +288,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
 
   String? userIdValidator(String? value) {
     if (value == null || value.isEmpty) {

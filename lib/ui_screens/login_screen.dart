@@ -34,11 +34,13 @@ class _LoginScreenState extends State<LoginScreen> {
     // userIdController.text = 'demo';
     // passwordController.text = 'demo@123';
   }
+
   Future<void> signin() async {
     try {
       bool isConnected = await CommonUtils.checkInternetConnectivity();
       if (!isConnected) {
-        Fluttertoast.showToast(msg: 'No internet connection, Please try again.');
+        Fluttertoast.showToast(
+            msg: 'No internet connection, Please try again.');
         FocusScope.of(context).unfocus();
         Navigator.of(context).pop();
         return;
@@ -67,7 +69,8 @@ class _LoginScreenState extends State<LoginScreen> {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('UserName', responseData['UserName']);
-        await prefs.setString('ApplicationName', responseData['ApplicationName']);
+        await prefs.setString(
+            'ApplicationName', responseData['ApplicationName']);
 
         // Save credentials if "Remember Me" is checked
         if (rememberMeChecked) {
@@ -108,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> loadSavedCredentials() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool rememberMe = prefs.getBool('RememberMe') ?? false;
-print('rememberMe: $rememberMe');
+    print('rememberMe: $rememberMe');
     if (rememberMe) {
       setState(() {
         userIdController.text = prefs.getString('SavedUserName') ?? '';
@@ -116,11 +119,11 @@ print('rememberMe: $rememberMe');
         rememberMeChecked = rememberMe;
       });
     }
- }
+  }
 
   @override
   Widget build(BuildContext context) {
-   // #272A33
+    // #272A33
     return Scaffold(
       backgroundColor: const Color(0xFF272A33),
       body: SafeArea(
@@ -138,26 +141,24 @@ print('rememberMe: $rememberMe');
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Logo and Title Section
-                    Row(
+                    /*  Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             shape: BoxShape.circle,
-                            //   color: Colors.white.withOpacity(0.1),
                           ),
                           padding: const EdgeInsets.all(8.0),
                           child: Image.asset(
                             Assets.images.mainLogo.path,
-                            // 'assets/app_logo_512.png',
-                            // Load logo from drawable (assets)
-
                           ),
                         ),
-
                       ],
+                    ), */
+                    Image.asset(
+                      Assets.images.mainLogo.path,
+                      width: MediaQuery.of(context).size.width * 0.8,
                     ),
-
 
                     const SizedBox(height: 40),
                     Align(
@@ -226,10 +227,14 @@ print('rememberMe: $rememberMe');
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          if (formKey.currentState!.validate()) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+          );
+          /*  if (formKey.currentState!.validate()) {
             CommonUtils.showLoadingDialog(context);
             signin();
-          }
+          } */
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF42A5F5),
@@ -288,7 +293,6 @@ print('rememberMe: $rememberMe');
       ),
     );
   }
-
 
   String? userIdValidator(String? value) {
     if (value == null || value.isEmpty) {

@@ -4,6 +4,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:inspectionpro/database/InspDatabaseHelper.dart';
+import 'package:inspectionpro/utils/styles.dart';
 import 'package:inspectionpro/widgets/custom_button.dart';
 import 'package:inspectionpro/widgets/custom_textfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,7 +32,6 @@ class RejectPipeline extends StatefulWidget {
 }
 
 class _RejectPipelineState extends State<RejectPipeline> {
-
   String userName = "";
   String applicationName = "";
   List<bool> isChecked = []; // Correctly initialized
@@ -42,9 +42,10 @@ class _RejectPipelineState extends State<RejectPipeline> {
   late Future<List<Map<String, dynamic>>> futureLineValuesfordificency;
   late Future<List<Map<String, dynamic>>> futureLineValuesforAction;
   late Future<List<Map<String, dynamic>>> operators;
-  String? selectedDdUnit,selectedDdUnitID;
+  String? selectedDdUnit, selectedDdUnitID;
   String? selectedDdOperator;
-  final TextEditingController noteController = TextEditingController(); // Add this at the top
+  final TextEditingController noteController =
+      TextEditingController(); // Add this at the top
   @override
   void initState() {
     super.initState();
@@ -95,6 +96,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
       rethrow;
     }
   }
+
   Future<List<Map<String, dynamic>>> fetchLine() async {
     try {
       final dbHelper = InspDatabaseHelper();
@@ -109,8 +111,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
   Future<List<Map<String, dynamic>>> fetchLineValues(int isInspection) async {
     try {
       final dbHelper = InspDatabaseHelper();
-      final result = await dbHelper.getLineValues(
-          isInspection); // Pass isInspection value
+      final result =
+          await dbHelper.getLineValues(isInspection); // Pass isInspection value
       print('fetchLineValues: ${jsonEncode(result)}');
       return result;
     } catch (e) {
@@ -118,16 +120,15 @@ class _RejectPipelineState extends State<RejectPipeline> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFF212121),
         title: Row(
           children: [
-
             /// **App Logo from Assets**
             Image.asset(
               'assets/images/app_logo_512.png', // Your logo path
@@ -141,23 +142,19 @@ class _RejectPipelineState extends State<RejectPipeline> {
               'InspectionPro',
               style: TextStyle(color: Colors.white, fontSize: 20),
             ),
-
-
           ],
         ),
       ),
-      body:
-      GestureDetector(
+      body: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
         },
-        child:
-        SingleChildScrollView(
+        child: SingleChildScrollView(
           child: Column(
             children: [
               facilitySection(),
               const SizedBox(height: 5),
-              deficiencySection('${widget.name}'),
+              deficiencySection(widget.name),
               const SizedBox(height: 5),
               units(),
               deficiencyType(),
@@ -169,20 +166,21 @@ class _RejectPipelineState extends State<RejectPipeline> {
                 padding: const EdgeInsets.all(10),
                 child: Row(
                   children: [
-                    /// **RESET Button - Clears all selected data**
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            selectedDdUnitID= null;
+                            selectedDdUnitID = null;
                             selectedDdUnit = null;
                             selectedDdOperator = null;
                             selectedItems.clear();
                             selectedItemsdiff.clear();
+                            noteController.clear();
+                            FocusScope.of(context).unfocus();
                           });
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFF5F5F5),
+                          backgroundColor: CommonStyles.colorGrey[200],
                           side: const BorderSide(color: Colors.black),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
@@ -195,8 +193,6 @@ class _RejectPipelineState extends State<RejectPipeline> {
                       ),
                     ),
                     const SizedBox(width: 12),
-
-                    /// **SUBMIT Button - Prints Selected Values**
                     Expanded(
                       child: ElevatedButton(
                         onPressed: _handleSubmit,
@@ -222,6 +218,139 @@ class _RejectPipelineState extends State<RejectPipeline> {
     );
   }
 
+  void shoWMoreDeficienciesDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(10),
+                child: Text(
+                  'InspectionPro',
+                  style: CommonStyles.txStyF15CbFF6.copyWith(
+                    fontSize: 20,
+                    color: CommonStyles.colorBlue,
+                  ),
+                ),
+              ),
+              const Divider(
+                color: CommonStyles.colorBlue,
+              ),
+              // Content with message
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                child: Text(
+                  'Do you want add more deficiencies',
+                  style: CommonStyles.txStyF15CbFF6.copyWith(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w200,
+                  ),
+                  // style: TextStyle(fontSize: 22, fontWeight: FontWeight.w200),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              // Buttons
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        btnText: 'No',
+                        backgroundColor: CommonStyles.colorBlue,
+                        onPressed: () {
+                          Navigator.pop(context);
+                          sendDataToCloud(widget.lineId).whenComplete(() {
+                            /* Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()),
+                      ); */
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const HomeScreen()),
+                              (Route<dynamic> route) => false,
+                            );
+                          });
+                        },
+                        btnStyle:
+                            const TextStyle(color: Colors.white, fontSize: 15),
+                      ),
+                    ),
+                    const SizedBox(width: 25),
+                    Expanded(
+                      child: CustomButton(
+                        btnText: 'Yes',
+                        backgroundColor: CommonStyles.colorBlue,
+                        onPressed: () {
+                          Navigator.pop(context);
+                          setState(() {
+                            selectedDdUnitID = null;
+                            selectedDdUnit = null;
+                            selectedDdOperator = null;
+                            selectedItems.clear();
+                            selectedItemsdiff.clear();
+                          });
+                        },
+                        btnStyle:
+                            const TextStyle(color: Colors.white, fontSize: 15),
+                      ),
+                    ),
+                    /* ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close dialog
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: CommonStyles.colorBlue, // Blue background
+                        foregroundColor: Colors.white, // White text
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      child: Text('No', style: TextStyle(fontSize: 14)),
+                    ), */
+                    /* ElevatedButton(
+                      onPressed: () {
+                        // Handle "Yes" action here
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: CommonStyles.colorBlue, // Blue background
+                        foregroundColor: Colors.white, // White text
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                      child: Text('Yes', style: TextStyle(fontSize: 14)),
+                    ), */
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   Padding note() {
     return Padding(
@@ -236,10 +365,11 @@ class _RejectPipelineState extends State<RejectPipeline> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 4),
           CustomTextfield(
-            controller: noteController,  // Assign controller here
+            controller: noteController, // Assign controller here
             maxLines: 4,
-            focusBorderColor: Colors.grey[500],
+            focusBorderColor: CommonStyles.colorGrey[500],
           ),
         ],
       ),
@@ -262,6 +392,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
                 showSelectionDialog(
                   context,
                   resultLines,
+                  hintText: 'Select Corrective Action',
                   onSubmit: () {
                     setState(() {
                       selectedItems = [];
@@ -290,8 +421,15 @@ class _RejectPipelineState extends State<RejectPipeline> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 24, top: 8),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                      ).copyWith(left: 21),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: CommonStyles.colorGrey),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -299,10 +437,14 @@ class _RejectPipelineState extends State<RejectPipeline> {
                             child: Text(
                               selectedItems.isNotEmpty
                                   ? selectedItems
-                                  .map((e) => e['name'])
-                                  .join(', ')
+                                      .map((e) => e['name'])
+                                      .join(', ')
                                   : 'Choose Corrective Action',
-                              style: const TextStyle(fontSize: 15),
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  color: selectedItems.isNotEmpty
+                                      ? Colors.black
+                                      : CommonStyles.colorGrey),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -338,6 +480,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
                 showSelectionDialog(
                   context,
                   resultLines,
+                  hintText: 'Select Deficiency Type',
                   onSubmit: () {
                     setState(() {
                       selectedItemsdiff = [];
@@ -366,8 +509,16 @@ class _RejectPipelineState extends State<RejectPipeline> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 24, top: 8),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                      ).copyWith(left: 21),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: CommonStyles.colorGrey),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      margin: const EdgeInsets.only(bottom: 10),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -375,10 +526,14 @@ class _RejectPipelineState extends State<RejectPipeline> {
                             child: Text(
                               selectedItemsdiff.isNotEmpty
                                   ? selectedItemsdiff
-                                  .map((e) => e['name'])
-                                  .join(', ')
+                                      .map((e) => e['name'])
+                                      .join(', ')
                                   : 'Choose Deficiency Type',
-                              style: const TextStyle(fontSize: 15),
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  color: selectedItemsdiff.isNotEmpty
+                                      ? Colors.black
+                                      : CommonStyles.colorGrey),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -398,7 +553,6 @@ class _RejectPipelineState extends State<RejectPipeline> {
     );
   }
 
-
   FutureBuilder<List<Map<String, dynamic>>> units() {
     return FutureBuilder(
       future: futureUnits,
@@ -413,7 +567,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
             return categoryItem(
               title: 'Unit',
               data: resultLines,
-              child: customDropDown(
+              child: unitDropDown(
                 resultLines,
                 selectedValue: selectedDdUnit,
                 onChanged: (String? value) {
@@ -423,12 +577,12 @@ class _RejectPipelineState extends State<RejectPipeline> {
 
                   // Find the selected unit in the list and print unitId & name
                   final selectedUnit = resultLines.firstWhere(
-                        (unit) => unit['name'] == value,
+                    (unit) => unit['name'] == value,
                     orElse: () => {},
                   );
 
                   if (selectedUnit.isNotEmpty) {
-                    selectedDdUnitID = selectedUnit['unitId'] ;
+                    selectedDdUnitID = selectedUnit['unitId'];
                     print("Selected Unit ID: ${selectedDdUnitID}");
                     print("Selected Unit Name: ${selectedUnit['name']}");
                   }
@@ -443,61 +597,77 @@ class _RejectPipelineState extends State<RejectPipeline> {
     );
   }
 
-  DropdownButtonHideUnderline customDropDown(List<Map<String, dynamic>> data,
+  Widget unitDropDown(List<Map<String, dynamic>> data,
       {required String? selectedValue, void Function(String?)? onChanged}) {
-    return DropdownButtonHideUnderline(
-      child: DropdownButton2<String>(
-        iconStyleData: const IconStyleData(
-          icon: Icon(Icons.keyboard_arrow_down_rounded),
-        ),
-        isExpanded: true,
-        hint: const Text(
-          'Choose Unit ',
-          style: TextStyle(fontSize: 15),
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-        ),
-        items: data
-            .map(
-              (Map<String, dynamic> value) => DropdownMenuItem<String>(
-            value: value['name'],
-            child: Text(
-              value['name'],
-              style: const TextStyle(
-                fontSize: 15,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: CommonStyles.colorGrey),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      margin: const EdgeInsets.only(bottom: 10),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton2<String>(
+          iconStyleData: const IconStyleData(
+            icon: Icon(Icons.keyboard_arrow_down_rounded),
+          ),
+          isExpanded: true,
+          hint: const Text(
+            'Choose Unit ',
+            style: CommonStyles.txStyF15CgFF6,
+            /* style: TextStyle(
+              fontSize: 15,
+              color: CommonStyles.colorGrey,
+            ), */
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+          ),
+          items: [
+            const DropdownMenuItem<String>(
+              value: '-1',
+              enabled: false,
+              child: Text(
+                'Select Unit',
+                style: CommonStyles.txStyF15CbFF6,
               ),
-              textAlign: TextAlign.center,
-              overflow: TextOverflow.ellipsis,
+            ),
+            ...data.map(
+              (Map<String, dynamic> value) => DropdownMenuItem<String>(
+                value: value['name'],
+                child: Text(
+                  value['name'],
+                  style: CommonStyles.txStyF15CbFF6,
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          ],
+          value: selectedValue,
+          onChanged: onChanged,
+          dropdownStyleData: DropdownStyleData(
+            maxHeight: 250,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+              ),
+              color: Colors.white,
+            ),
+            offset: const Offset(0, 0),
+            scrollbarTheme: ScrollbarThemeData(
+              radius: const Radius.circular(40),
+              thickness: WidgetStateProperty.all<double>(6),
+              thumbVisibility: WidgetStateProperty.all<bool>(true),
             ),
           ),
-        )
-            .toList(),
-        value: selectedValue,
-        onChanged: onChanged,
-        dropdownStyleData: DropdownStyleData(
-          maxHeight: 250,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
-            ),
-            color: Colors.white,
+          menuItemStyleData: const MenuItemStyleData(
+            height: 40,
+            padding: EdgeInsets.symmetric(horizontal: 20),
           ),
-          offset: const Offset(0, 0),
-          scrollbarTheme: ScrollbarThemeData(
-            radius: const Radius.circular(40),
-            thickness: WidgetStateProperty.all<double>(6),
-            thumbVisibility: WidgetStateProperty.all<bool>(true),
-          ),
-        ),
-        menuItemStyleData: const MenuItemStyleData(
-          height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 20),
         ),
       ),
     );
   }
-
 
   FutureBuilder<List<Map<String, dynamic>>> operator() {
     return FutureBuilder(
@@ -513,7 +683,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
             return categoryItem(
               title: 'Operator',
               data: resultLines,
-              child: custom_DropDown(
+              child: operatorDropDown(
                 resultLines,
                 selectedValue: selectedDdOperator,
                 onChanged: (String? value) {
@@ -538,7 +708,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
       padding: const EdgeInsets.all(8.0),
       child: Text(
         'FACILITY: $applicationName / USER: $userName',
-        style: TextStyle(fontSize: 16),
+        style: const TextStyle(fontSize: 16),
       ),
     );
   }
@@ -556,9 +726,10 @@ class _RejectPipelineState extends State<RejectPipeline> {
     );
   }
 
-  Widget categoryItem({required String title,
-    required List<Map<String, dynamic>> data,
-    required Widget child}) {
+  Widget categoryItem(
+      {required String title,
+      required List<Map<String, dynamic>> data,
+      required Widget child}) {
     return Container(
       width: double.infinity,
       alignment: Alignment.centerLeft,
@@ -573,76 +744,86 @@ class _RejectPipelineState extends State<RejectPipeline> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          const SizedBox(height: 4),
           child,
         ],
       ),
     );
   }
 
-  DropdownButtonHideUnderline custom_DropDown(List<Map<String, dynamic>> data,
+  Widget operatorDropDown(List<Map<String, dynamic>> data,
       {required String? selectedValue, void Function(String?)? onChanged}) {
-    return DropdownButtonHideUnderline(
-      child: DropdownButton2<String>(
-        iconStyleData: const IconStyleData(
-          icon: Icon(
-            Icons.keyboard_arrow_down_rounded,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: CommonStyles.colorGrey),
+        borderRadius: BorderRadius.circular(5),
+      ),
+      margin: const EdgeInsets.only(bottom: 10),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton2<String>(
+          iconStyleData: const IconStyleData(
+            icon: Icon(
+              Icons.keyboard_arrow_down_rounded,
+            ),
           ),
-        ),
-        isExpanded: true,
-        hint: const Text(
-          'Choose Operator',
-          style: TextStyle(
-            fontSize: 15,
+          isExpanded: true,
+          hint: const Text(
+            'Choose Operator',
+            style: CommonStyles.txStyF15CgFF6,
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
           ),
-          textAlign: TextAlign.center,
-          overflow: TextOverflow.ellipsis,
-        ),
-        items: data
-            .map(
-              (Map<String, dynamic> value) =>
-              DropdownMenuItem<String>(
+          items: [
+            const DropdownMenuItem<String>(
+              value: '-1',
+              enabled: false,
+              child: Text(
+                'Select Operator',
+                style: CommonStyles.txStyF15CbFF6,
+              ),
+            ),
+            ...data.map(
+              (Map<String, dynamic> value) => DropdownMenuItem<String>(
                 value: value['name'],
                 child: Text(
                   value['name'],
-                  style: const TextStyle(
-                    fontSize: 15,
-                  ),
+                  style: CommonStyles.txStyF15CbFF6,
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-        )
-            .toList(),
-        value: selectedValue,
-        onChanged: onChanged,
-
-        dropdownStyleData: DropdownStyleData(
-          maxHeight: 250, // 6 items * 40 height per item = 240
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(12),
-              bottomLeft: Radius.circular(12),
+            )
+          ],
+          value: selectedValue,
+          onChanged: onChanged,
+          dropdownStyleData: DropdownStyleData(
+            maxHeight: 250, // 6 items * 40 height per item = 240
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+              ),
+              color: Colors.white,
             ),
-            color: Colors.white,
+            offset: const Offset(0, 0),
+            scrollbarTheme: ScrollbarThemeData(
+              radius: const Radius.circular(40),
+              thickness: WidgetStateProperty.all<double>(6),
+              thumbVisibility: WidgetStateProperty.all<bool>(true),
+            ),
           ),
-          offset: const Offset(0, 0),
-          scrollbarTheme: ScrollbarThemeData(
-            radius: const Radius.circular(40),
-            thickness: WidgetStateProperty.all<double>(6),
-            thumbVisibility: WidgetStateProperty.all<bool>(true),
+          menuItemStyleData: const MenuItemStyleData(
+            height: 40,
+            padding: EdgeInsets.symmetric(horizontal: 20),
           ),
-        ),
-        menuItemStyleData: const MenuItemStyleData(
-          height: 40,
-          padding: EdgeInsets.symmetric(horizontal: 20),
         ),
       ),
     );
   }
 
-  void showSelectionDialog(BuildContext context,
-      List<Map<String, dynamic>> result,
-      {required void Function()? onSubmit}) {
+  void showSelectionDialog(
+      BuildContext context, List<Map<String, dynamic>> result,
+      {required void Function()? onSubmit, required String hintText}) {
     if (isChecked.length != result.length) {
       isChecked = List.filled(result.length, false);
     }
@@ -661,20 +842,29 @@ class _RejectPipelineState extends State<RejectPipeline> {
                   children: [
                     Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: List.generate(result.length, (index) {
-                        final data = result[index];
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ListTile(
+                          title: Text(
+                            hintText,
+                            style: CommonStyles.txStyF15CbFF6,
+                          ),
+                        ),
+                        ...List.generate(result.length, (index) {
+                          final data = result[index];
 
-                        return CheckboxListTile(
-                          title: Text(data['name']),
-                          value: isChecked[index],
-                          onChanged: (bool? value) {
-                            setState(() {
-                              isChecked[index] = value ?? false;
-                            });
-                          },
-                          controlAffinity: ListTileControlAffinity.leading,
-                        );
-                      }),
+                          return CheckboxListTile(
+                            title: Text(data['name']),
+                            value: isChecked[index],
+                            onChanged: (bool? value) {
+                              setState(() {
+                                isChecked[index] = value ?? false;
+                              });
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                          );
+                        }),
+                      ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -688,7 +878,6 @@ class _RejectPipelineState extends State<RejectPipeline> {
                         ),
                         TextButton(
                           onPressed: onSubmit,
-
                           child: const Text('SUBMIT',
                               style: TextStyle(color: Colors.teal)),
                         ),
@@ -711,45 +900,43 @@ class _RejectPipelineState extends State<RejectPipeline> {
       userName = prefs.getString('UserName') ?? 'Guest';
       applicationName = prefs.getString('ApplicationName') ?? 'UnknownApp';
     });
-
-
   }
 
   Future<void> sendDataToCloud(String lineId) async {
     bool networkAvailable = await isNetworkAvailable();
 
-  final apiUrl = Uri.parse('$baseUrl$SaveLines');
-  print("🌐 API URL: $apiUrl");
-  print("🌐networkAvailable: $networkAvailable");
-  if (networkAvailable) {
-    _showProgressBar(context, "Please wait...");
+    final apiUrl = Uri.parse('$baseUrl$SaveLines');
+    print("🌐 API URL: $apiUrl");
+    print("🌐networkAvailable: $networkAvailable");
+    if (networkAvailable) {
+      _showProgressBar(context, "Please wait...");
 
-    try {
-      Map<String, dynamic> requestBody = sendObj(lineId);
-      final response = await http.put(
-        apiUrl,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestBody),
-      );
-      print("requestBody: ${jsonEncode(requestBody)}");
-      print("Response Status Code: ${response.statusCode}");
-      _hideProgressBar(context);
+      try {
+        Map<String, dynamic> requestBody = sendObj(lineId);
+        final response = await http.put(
+          apiUrl,
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(requestBody),
+        );
+        print("requestBody: ${jsonEncode(requestBody)}");
+        print("Response Status Code: ${response.statusCode}");
+        _hideProgressBar(context);
 
-      if (response.statusCode == 200) {
-        print("✅ Data successfully sent to cloud!");
-        await saveDataInDb(lineId);
-
-      } else {
-        print("❌ Failed to send data: ${response.body}");
+        if (response.statusCode == 200) {
+          print("✅ Data successfully sent to cloud!");
+          await saveDataInDb(lineId);
+        } else {
+          print("❌ Failed to send data: ${response.body}");
+        }
+      } catch (e) {
+        print("❌ Error sending data: $e");
+        _hideProgressBar(context);
       }
-    } catch (e) {
-      print("❌ Error sending data: $e");
-      _hideProgressBar(context);
+    } else {
+      await saveDataInDb(lineId);
     }
-  } else {
-    await saveDataInDb(lineId);
   }
-  }
+
   Future<bool> isNetworkAvailable() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     print("🔍 Connectivity Check: $connectivityResult"); // Debug log
@@ -759,6 +946,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
 
     return hasInternet;
   }
+
   void _showProgressBar(BuildContext context, String message) {
     showDialog(
       context: context,
@@ -767,7 +955,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
         return AlertDialog(
           content: Row(
             children: [
-              CircularProgressIndicator(),
+              const CircularProgressIndicator(),
               const SizedBox(width: 20),
               Text(message),
             ],
@@ -781,6 +969,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
   void _hideProgressBar(BuildContext context) {
     Navigator.of(context, rootNavigator: true).pop();
   }
+
   Future<void> saveDataInDb(String lineId) async {
     final dbHelper = InspDatabaseHelper();
     final db = await dbHelper.database;
@@ -803,7 +992,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
 
         // Delete existing data if found
         if (existingData.isNotEmpty) {
-          await txn.delete("savedData", where: "lineId = ?", whereArgs: [lineId]);
+          await txn
+              .delete("savedData", where: "lineId = ?", whereArgs: [lineId]);
           print("🗑 Existing data deleted for lineId: $lineId");
         }
 
@@ -818,20 +1008,17 @@ class _RejectPipelineState extends State<RejectPipeline> {
             [1, lineId],
           );
           if (rowsAffected > 0) {
-            print("✅ Status updated for lineId: $lineId ($rowsAffected rows affected)");
+            print(
+                "✅ Status updated for lineId: $lineId ($rowsAffected rows affected)");
           } else {
             print("❌ Status update failed for lineId: $lineId");
-
           }
         }
       } catch (e) {
         print("❌ Error saving data: $e");
       }
     });
-
-
   }
-
 
   Map<String, dynamic> sendObj(String lineId) {
     print("📌 Sending lineId: $lineId");
@@ -841,7 +1028,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
       {
         "deficiency": selectedItemsdiff.map((e) => e['name']).toList(),
         "correction": selectedItems.map((e) => e['name']).toList(),
-        "unitId": selectedDdUnitID,  // Ensure this holds a valid Unit ID
+        "unitId": selectedDdUnitID, // Ensure this holds a valid Unit ID
         "person": selectedDdOperator, // Ensure this holds a valid Operator name
         "comments": '${noteController.text}' // You can change this dynamically
       }
@@ -853,6 +1040,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
       "failedUnits": failedUnits,
     };
   }
+
   // Validation functions
   bool _validateUnit() {
     return selectedDdUnitID != null;
@@ -902,10 +1090,13 @@ class _RejectPipelineState extends State<RejectPipeline> {
     // All validations passed, proceed with form submission
     print('Selected Unit: $selectedDdUnitID');
     print('Selected Operator: $selectedDdOperator');
-    print('Selected Deficiency Types: ${selectedItemsdiff.map((e) => e['name']).join(', ')}');
-    print('Selected Corrective Actions: ${selectedItems.map((e) => e['name']).join(', ')}');
-    _showConfirmationDialog();
- //   sendDataToCloud('${widget.lineId}');
+    print(
+        'Selected Deficiency Types: ${selectedItemsdiff.map((e) => e['name']).join(', ')}');
+    print(
+        'Selected Corrective Actions: ${selectedItems.map((e) => e['name']).join(', ')}');
+    // _showConfirmationDialog();
+    shoWMoreDeficienciesDialog(context);
+    //   sendDataToCloud('${widget.lineId}');
   }
 
   Future<void> _showConfirmationDialog() async {
@@ -916,7 +1107,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
           title: const Center(
             child: Text(
               "InspectionPro",
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold, color: CommonStyles.colorBlue),
             ),
           ),
           content: const Text("Do you want to add more deficiencies?"),
@@ -928,16 +1120,18 @@ class _RejectPipelineState extends State<RejectPipeline> {
                   child: ElevatedButton(
                     onPressed: () {
                       Navigator.pop(context);
-                      sendDataToCloud('${widget.lineId}');
+                      sendDataToCloud(widget.lineId);
                       Navigator.pushReplacement(
                         context,
-                        MaterialPageRoute(builder: (context) => const HomeScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()),
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: CommonStyles.colorBlue,
                     ),
-                    child: const Text("No", style: TextStyle(color: Colors.white)),
+                    child:
+                        const Text("No", style: TextStyle(color: Colors.white)),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -954,9 +1148,10 @@ class _RejectPipelineState extends State<RejectPipeline> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      backgroundColor: CommonStyles.colorBlue,
                     ),
-                    child: const Text("Yes", style: TextStyle(color: Colors.white)),
+                    child: const Text("Yes",
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ),
               ],
@@ -966,7 +1161,4 @@ class _RejectPipelineState extends State<RejectPipeline> {
       },
     );
   }
-
-
 }
-

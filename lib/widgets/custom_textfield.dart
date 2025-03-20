@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:inspectionpro/utils/styles.dart';
 
 class CustomTextfield extends StatelessWidget {
   final bool? filled;
@@ -42,11 +43,11 @@ class CustomTextfield extends StatelessWidget {
           hintStyle: const TextStyle(color: Colors.grey),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
-            borderSide: BorderSide(color: Colors.grey[300]!),
+            borderSide: BorderSide(color: CommonStyles.colorGrey),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
-            borderSide: BorderSide(color: Colors.grey[300]!),
+            borderSide: BorderSide(color: CommonStyles.colorGrey),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),

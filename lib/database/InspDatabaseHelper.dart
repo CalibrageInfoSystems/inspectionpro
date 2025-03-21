@@ -325,7 +325,48 @@ class InspDatabaseHelper {
       print(row);
     }
   }
+
+   Future<bool> clearOldData() async {
+    try {
+      final db = await database;// Ensure database is initialized
+
+      await clearTable('savedData'); // Clear existing data
+
+
+
+      return true;
+    } catch (e) {
+      print("Error clearing data: $e");
+      return false;
+    }
+  }
+
+
+
+   Future<void> resetTables(Database db, List<String> tableNames) async {
+    try {
+      for (String name in tableNames) {
+        await clearTable(name);
+      }
+    } catch (e) {
+      print("Error resetting tables: $e");
+    }
+  }
+
+  Future<List<String>> getSavedData() async {
+
+    final db = await database;// Ensure database is initialized
+
+    final List<Map<String, dynamic>> result = await db!.rawQuery(
+      "SELECT name FROM savedData ORDER BY _id",
+    );
+
+    return result.map((row) => row["name"].toString()).toList();
+  }
+
 }
+
+
 
 
   /// **Insert Methods for Specific Tables with Print Statements**

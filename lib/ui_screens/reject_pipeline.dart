@@ -44,8 +44,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
   late Future<List<Map<String, dynamic>>> operators;
   String? selectedDdUnit, selectedDdUnitID;
   String? selectedDdOperator;
-  final TextEditingController noteController =
-      TextEditingController(); // Add this at the top
+  int deficiencyCount = 1;
+  final TextEditingController noteController = TextEditingController(); // Add this at the top
   @override
   void initState() {
     super.initState();
@@ -274,24 +274,17 @@ class _RejectPipelineState extends State<RejectPipeline> {
                         backgroundColor: CommonStyles.colorBlue,
                         onPressed: () {
                           Navigator.pop(context);
-                          sendDataToCloud(widget.lineId).whenComplete(() {
-                            /* Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
-                      ); */
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()),
-                              (Route<dynamic> route) => false,
-                            );
-                          });
+                          sendDataToCloud(widget.lineId);
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HomeScreen()),
+                          );
                         },
-                        btnStyle:
-                            const TextStyle(color: Colors.white, fontSize: 15),
+                        btnStyle: const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                     ),
+
                     const SizedBox(width: 25),
                     Expanded(
                       child: CustomButton(
@@ -305,6 +298,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
                             selectedDdOperator = null;
                             selectedItems.clear();
                             selectedItemsdiff.clear();
+
+                            deficiencyCount = deficiencyCount + 1;
                           });
                         },
                         btnStyle:
@@ -622,12 +617,14 @@ class _RejectPipelineState extends State<RejectPipeline> {
             overflow: TextOverflow.ellipsis,
           ),
           items: [
-            const DropdownMenuItem<String>(
+             DropdownMenuItem<String>(
               value: '-1',
               enabled: false,
               child: Text(
                 'Select Unit',
-                style: CommonStyles.txStyF15CbFF6,
+                style: CommonStyles.txStyF15CbFF6.copyWith(
+                  color: CommonStyles.colorGrey,
+                ),
               ),
             ),
             ...data.map(
@@ -719,7 +716,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
       color: Colors.red,
       padding: const EdgeInsets.all(10),
       child: Text(
-        '#Deficiency 1 - $s',
+        '#Deficiency $deficiencyCount - $s',
         // Use string interpolation instead of concatenation
         style: const TextStyle(fontSize: 16, color: Colors.white),
       ),
@@ -909,7 +906,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
     print("🌐 API URL: $apiUrl");
     print("🌐networkAvailable: $networkAvailable");
     if (networkAvailable) {
-      _showProgressBar(context, "Please wait...");
+    //  _showProgressBar(context, "Please wait...");
 
       try {
         Map<String, dynamic> requestBody = sendObj(lineId);
@@ -920,17 +917,17 @@ class _RejectPipelineState extends State<RejectPipeline> {
         );
         print("requestBody: ${jsonEncode(requestBody)}");
         print("Response Status Code: ${response.statusCode}");
-        _hideProgressBar(context);
+       // _hideProgressBar(context);
 
         if (response.statusCode == 200) {
           print("✅ Data successfully sent to cloud!");
-          await saveDataInDb(lineId);
+     //     await saveDataInDb(lineId);
         } else {
           print("❌ Failed to send data: ${response.body}");
         }
       } catch (e) {
         print("❌ Error sending data: $e");
-        _hideProgressBar(context);
+      //  _hideProgressBar(context);
       }
     } else {
       await saveDataInDb(lineId);
@@ -1145,6 +1142,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
                         selectedDdOperator = null;
                         selectedItems.clear();
                         selectedItemsdiff.clear();
+
+                        deficiencyCount = deficiencyCount + 1;
                       });
                     },
                     style: ElevatedButton.styleFrom(

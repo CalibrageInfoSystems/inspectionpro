@@ -86,116 +86,120 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF212121),
-        title: Row(
-          children: [
-            /// **App Logo from Assets**
-            Image.asset(
-              'assets/images/app_logo_512.png',  // Your logo path
-              width: 40,
-              height: 40,
-            ),
-            const SizedBox(width: 8),
-
-            /// **App Name**
-            const Text(
-              'InspectionPro',
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            const Spacer(),
-
-            /// **First Custom Icon (Sync)**
-            IconButton(
-              onPressed: () {
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const RejectPipeline(),
-                //   ),
-                // );
-              },
-              icon: Image.asset(
-                Assets.images.sync.path,
-                width: 24,
-                height: 24,
-                color: Colors.white,  // Optional: Color overlay
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF212121),
+          title: Row(
+            children: [
+              /// **App Logo from Assets**
+              Image.asset(
+                'assets/images/app_logo_512.png',  // Your logo path
+                width: 40,
+                height: 40,
               ),
-            ),
+              const SizedBox(width: 8),
 
-            const SizedBox(width: 6),
-
-            /// **Second Custom Icon (Lock)**
-            IconButton(
-              onPressed: () {
-                logOutDialog(context);
-              },
-              icon: Image.asset(
-                Assets.images.logout.path,// Load from assets
-                width: 24,
-                height: 24,
-                color: Colors.white,
+              /// **App Name**
+              const Text(
+                'InspectionPro',
+                style: TextStyle(color: Colors.white, fontSize: 20),
               ),
-            ),
-          ],
+              const Spacer(),
+
+              /// **First Custom Icon (Sync)**
+              IconButton(
+                onPressed: _onSyncPressed,
+                icon: Image.asset(
+                  Assets.images.sync.path,
+                  width: 24,
+                  height: 24,
+                  color: Colors.white,  // Optional: Color overlay
+                ),
+              ),
+
+              const SizedBox(width: 6),
+
+              /// **Second Custom Icon (Lock)**
+              IconButton(
+                onPressed: () {
+                  logOutDialog(context);
+                },
+                icon: Image.asset(
+                  Assets.images.logout.path,// Load from assets
+                  width: 24,
+                  height: 24,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
-      body:
-      Container(
-        color: const Color(0xFFF5F5F5),
-        child: Column(
-          children: [
-            Container(
-              alignment: Alignment.centerRight,
-              color: const Color.fromARGB(255, 153, 153, 153),
-              padding: const EdgeInsets.all(8.0),
-              child:  Text(
-                'FACILITY: $applicationName / USER: $userName',
-                style: TextStyle(fontSize: 16),
+        body:
+        Container(
+          color: const Color(0xFFF5F5F5),
+          child: Column(
+            children: [
+              Container(
+                alignment: Alignment.centerRight,
+                color: const Color.fromARGB(255, 153, 153, 153),
+                padding: const EdgeInsets.all(8.0),
+                child:  Text(
+                  'FACILITY: $applicationName / USER: $userName',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => showFailedOnly = false),
-                      child: _buildTab('All : ${lines.length}', Colors.grey),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => showFailedOnly = false),
+                        child: Container(
+                          width: double.infinity,
+                          child: _buildTab('All : ${lines.length}', Colors.grey),
+                        ),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: _buildTab('Unsaved : 0', Colors.blue), // Update Unsaved count logic if needed
-                  ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => showFailedOnly = true),
-                      child: _buildTab('Failed : ${failedLinesData.length}', Colors.red),
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        child: _buildTab('Unsaved : 0', Colors.blue),
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 5),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => setState(() => showFailedOnly = true),
+                        child: Container(
+                          width: double.infinity,
+                          child: _buildTab('Failed : ${failedLinesData.length}', Colors.red),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
+
 
               Expanded(
-              child: isLoading
-              ? const Center(child: CircularProgressIndicator()) // Show loader while data loads
-        : (showFailedOnly ? failedLinesData : lines).isEmpty
-    ? const Center(child: Text("No data found"))
-        : ListView.builder(
-    itemCount: showFailedOnly ? failedLinesData.length : lines.length,
-    itemBuilder: (context, index) {
-    final item = showFailedOnly ? failedLinesData[index] : lines[index];
-    return buildItem(item); // Pass data to `buildItem`
-    },
-    ),
-    ),
-    ],
-    ),
-    ));
+                child: isLoading
+                    ? const Center(child: CircularProgressIndicator()) // Show loader while data loads
+                    : (showFailedOnly ? failedLinesData : lines).isEmpty
+                    ? const Center(child: Text("No data found"))
+                    : ListView.builder(
+                  itemCount: showFailedOnly ? failedLinesData.length : lines.length,
+                  itemBuilder: (context, index) {
+                    final item = showFailedOnly ? failedLinesData[index] : lines[index];
+                    return buildItem(item); // Pass data to `buildItem`
+                  },
+                ),
+              ),
+            ],
+          ),
+        )
+    );
   }
 
   Widget _buildTab(String label,  Color color) {
@@ -227,8 +231,8 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Row(
         children: [
-    //  String dateTimeString = "2025-03-17T12:49:00.05+00:00"; // Example ISO 8601 format
-    
+          //  String dateTimeString = "2025-03-17T12:49:00.05+00:00"; // Example ISO 8601 format
+
           /// **Line Name & Last Executed Time**
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               print("Approved: ${line['name']}");
               SenddataCloud(line['lineId'],context);
-            //  saveDataInDb(line['lineId']);
+              //  saveDataInDb(line['lineId']);
             },
             style: IconButton.styleFrom(
               shape: RoundedRectangleBorder(
@@ -310,28 +314,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
   /// Fetch Data from SQLite
   ///
-    Future<void> fetchData() async {
-      setState(() {
-        isLoading = true; // Start loading
-      });
-      final dbHelper = InspDatabaseHelper();
+  Future<void> fetchData() async {
+    setState(() {
+      isLoading = true; // Start loading
+    });
+    final dbHelper = InspDatabaseHelper();
 
-      List<Map<String, dynamic>> fetchedLines = await dbHelper.getLines();
+    List<Map<String, dynamic>> fetchedLines = await dbHelper.getLines();
     // ..  List<Map<String, dynamic>> fetchedUnits = await dbHelper.getUnits();
-   //   List<Map<String, dynamic>> fetchedLineValues = await dbHelper.getLineValues();
+    //   List<Map<String, dynamic>> fetchedLineValues = await dbHelper.getLineValues();
 
-      List<Map<String, dynamic>> failedLines = fetchedLines.where((line) {
-        return line['status'] == 0; // Assuming 'status' is a boolean
-      }).toList();
+    List<Map<String, dynamic>> failedLines = fetchedLines.where((line) {
+      return line['status'] == 0; // Assuming 'status' is a boolean
+    }).toList();
 
-      setState(() {
-        lines = fetchedLines;
-        // units = fetchedUnits;
-     //   lineValues = fetchedLineValues;
-        failedLinesData = failedLines;
-        isLoading = false; // Data loaded, hide loader
-      });
-    }
+    setState(() {
+      lines = fetchedLines;
+      // units = fetchedUnits;
+      //   lineValues = fetchedLineValues;
+      failedLinesData = failedLines;
+      isLoading = false; // Data loaded, hide loader
+    });
+  }
 //   Future<void> fetchData() async {
 //     final dbHelper = InspDatabaseHelper();
 //
@@ -368,12 +372,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           content: const Text('Are You Sure You Want to Logout?',
-              style:TextStyle(
-        fontSize: 18,
-        color: Colors.black,
-        fontWeight: FontWeight.w600,
-        fontFamily: 'roboto',
-        ),
+            style:TextStyle(
+              fontSize: 18,
+              color: Colors.black,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'roboto',
+            ),
           ),
           actions: [
             /// **❌ No Button**
@@ -515,7 +519,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> refresh() async {
     setState(() => isLoading = true); // Show loading indicator
 
-fetchData();
+    fetchData();
 
     setState(() => isLoading = false); // Hide loading indicator
   }
@@ -553,7 +557,7 @@ fetchData();
       try {
         Map<String, dynamic> requestBody = sendObj(lineId);
         final response = await http.put(
-         apiUrl,
+          apiUrl,
           headers: {"Content-Type": "application/json"},
           body: jsonEncode(requestBody),
         );
@@ -593,32 +597,115 @@ fetchData();
       applicationName = prefs.getString('ApplicationName') ?? 'UnknownApp';
     });
   }
-  }
 
-  /// **Show Progress Bar (Uses Dialog)**
-  void _showProgressBar(BuildContext context, String message) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              const SizedBox(width: 20),
-              Text(message),
-            ],
-          ),
-        );
-      },
+  void _onSyncPressed() async {
+    // _showProgressBar(context, "Syncing...");
+
+    bool syncReady = await makeSyncReady();
+    if (!syncReady) {
+     // _hideProgressBar(context);
+      return;
+    }
+
+    bool success = await dbHelper.clearOldData();
+
+ //   _hideProgressBar(context);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            success ? "Sync successful" : "Sync failed. Please try again."),
+      ),
     );
   }
 
-  /// **Hide Progress Bar**
-  void _hideProgressBar(BuildContext context) {
-    Navigator.of(context, rootNavigator: true).pop();
+  Future<bool> makeSyncReady() async {
+    _showProgressBar(context, "Please wait...");
+
+    List<String> savedData = await dbHelper.getSavedData();
+    print('savedData : $savedData');
+    for (String sp in savedData) {
+      print('sp : $sp');
+      try {
+        await pendingdatasyncCloud(sp);
+
+      } catch (e) {
+        print("Error: $e");
+        _hideProgressBar(context);
+      }
+    }
+    _hideProgressBar(context);
+    return true;
   }
- 
+
+
+  Future<void> pendingdatasyncCloud(String sp) async {
+    print("Pending Data Sync: $sp");
+    bool networkAvailable = await isNetworkAvailable();
+
+    if (!networkAvailable) {
+      print("❌ No internet connection. Data will be stored locally.");
+      return;
+    }
+
+    final apiUrl = Uri.parse('$baseUrl$SaveLines');
+    print("🌐 API URL: $apiUrl");
+
+    try {
+      Map<String, dynamic> requestBody = jsonDecode(sp);
+
+      // Ensure `transactionId` is properly handled
+      requestBody["transactionId"] = requestBody["transactionId"] == "null" ? null : requestBody["transactionId"];
+
+      print("📤 Request Body: ${jsonEncode(requestBody)}");
+
+      final response = await http.put(
+        apiUrl,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(requestBody),
+      );
+
+      print("📥 Response Status Code: ${response.statusCode}");
+      print("📥 Response Body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        print("✅ Data successfully sent to cloud!");
+        refresh();
+      } else {
+        print("❌ Failed to send data: ${response.body}");
+      }
+    } catch (e) {
+      print("❌ Error sending data: $e");
+    }
+  }
+}
+
+
+
+/// **Show Progress Bar (Uses Dialog)**
+void _showProgressBar(BuildContext context, String message) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            const SizedBox(width: 20),
+            Text(message),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+/// **Hide Progress Bar**
+void _hideProgressBar(BuildContext context) {
+  Navigator.of(context, rootNavigator: true).pop();
+}
+
 
 
 

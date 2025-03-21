@@ -1,6 +1,8 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:inspectionpro/utils/styles.dart';
+import 'package:inspectionpro/widgets/custom_button.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class CommonUtils {
@@ -42,6 +44,7 @@ class CommonUtils {
       },
     );
   }
+
   static void showErrorToast(context, String message) {
     FToast fToast = FToast();
     fToast.init(context);
@@ -68,7 +71,8 @@ class CommonUtils {
           Expanded(
             child: Text(
               message,
-              style: const TextStyle(color: Colors.black, fontSize: 20,fontFamily: 'roboto'),
+              style: const TextStyle(
+                  color: Colors.black, fontSize: 20, fontFamily: 'roboto'),
             ),
           ),
         ],
@@ -81,7 +85,8 @@ class CommonUtils {
       toastDuration: const Duration(seconds: 3),
     );
   }
- static Future<bool> isNetworkAvailable() async {
+
+  static Future<bool> isNetworkAvailable() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     print("🔍 Connectivity Check: $connectivityResult"); // Debug log
 
@@ -90,74 +95,86 @@ class CommonUtils {
 
     return hasInternet;
   }
-/*   static void showLoadingDialog22(BuildContext context,
-      {String? status = 'Please wait...'}) {
+
+  static void showCustomDialog(
+    BuildContext context, {
+    required String title,
+    String? content,
+    void Function()? onCancel,
+    void Function()? onSubmit,
+  }) {
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return Dialog(
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(5),
           ),
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List.generate(options.length, (index) {
-                        return CheckboxListTile(
-                          title: Text(options[index]),
-                          value: isChecked[index],
-                          onChanged: (bool? value) {
-                            setState(() {
-                              isChecked[index] = value ?? false;
-                            });
-                          },
-                          controlAffinity: ListTileControlAffinity
-                              .leading, // Checkbox on the left
-                        );
-                      }),
-                    ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                width: double.infinity,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                  title,
+                  style: CommonStyles.txStyF15CbFF6.copyWith(
+                    fontSize: 22,
+                    color: CommonStyles.colorBlue,
                   ),
-                  );
-            },
-          ),
-        );
-        /*  return StatefulBuilder(
-          builder: (context,) {
-            return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(options.length, (index) {
-                    return CheckboxListTile(
-                      title: Text(options[index]),
-                      value: isChecked[index],
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isChecked[index] = value ?? false;
-                        });
-                      },
-                      controlAffinity:
-                          ListTileControlAffinity.leading, // Checkbox on the left
-                    );
-                  }),
                 ),
               ),
+              const Divider(
+                color: CommonStyles.colorBlue,
               ),
-            );
-          }
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                child: Text(
+                  '$content',
+                  style: CommonStyles.txStyF15CbFF6.copyWith(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        btnText: 'No',
+                        backgroundColor: CommonStyles.colorBlue,
+                        onPressed: onCancel,
+                        btnStyle:
+                            const TextStyle(color: Colors.white, fontSize: 15),
+                      ),
+                    ),
+                    const SizedBox(width: 25),
+                    Expanded(
+                      child: CustomButton(
+                        btnText: 'Yes',
+                        backgroundColor: CommonStyles.colorBlue,
+                        onPressed: onSubmit,
+                        btnStyle:
+                            const TextStyle(color: Colors.white, fontSize: 15),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         );
-      */
       },
     );
-  } */
+  }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:inspectionpro/database/InspDatabaseHelper.dart';
+import 'package:inspectionpro/gen/assets.gen.dart';
 import 'package:inspectionpro/utils/styles.dart';
 import 'package:inspectionpro/widgets/custom_button.dart';
 import 'package:inspectionpro/widgets/custom_textfield.dart';
@@ -47,7 +48,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
   String? selectedDdUnit, selectedDdUnitID;
   String? selectedDdOperator;
   int deficiencyCount = 1;
-  final TextEditingController noteController = TextEditingController(); // Add this at the top
+  final TextEditingController noteController =
+      TextEditingController(); // Add this at the top
   @override
   void initState() {
     super.initState();
@@ -133,7 +135,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
           children: [
             /// **App Logo from Assets**
             Image.asset(
-              'assets/images/app_logo_512.png', // Your logo path
+              Assets.images.appLogo512.path,
               width: 40,
               height: 40,
             ),
@@ -224,7 +226,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext dialogContext) { // Store dialog context separately
+      builder: (BuildContext dialogContext) {
+        // Store dialog context separately
         return Dialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
@@ -251,7 +254,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
               ),
               // Content with message
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                 child: Text(
                   'Do you want to add more deficiencies?',
                   style: CommonStyles.txStyF15CbFF6.copyWith(
@@ -263,7 +267,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
               ),
               // Buttons
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -274,7 +279,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
                         onPressed: () async {
                           Navigator.pop(dialogContext); // Close dialog first
 
-                          await sendDataToCloud(widget.lineId); // Wait for data upload
+                          await sendDataToCloud(
+                              widget.lineId); // Wait for data upload
 
                           if (context.mounted) {
                             Navigator.pushReplacement(
@@ -285,7 +291,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
                             );
                           }
                         },
-                        btnStyle: const TextStyle(color: Colors.white, fontSize: 15),
+                        btnStyle:
+                            const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                     ),
                     const SizedBox(width: 25),
@@ -305,7 +312,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
                             deficiencyCount = deficiencyCount + 1;
                           });
                         },
-                        btnStyle: const TextStyle(color: Colors.white, fontSize: 15),
+                        btnStyle:
+                            const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                     ),
                   ],
@@ -588,7 +596,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
             overflow: TextOverflow.ellipsis,
           ),
           items: [
-             DropdownMenuItem<String>(
+            DropdownMenuItem<String>(
               value: '-1',
               enabled: false,
               child: Text(
@@ -742,18 +750,16 @@ class _RejectPipelineState extends State<RejectPipeline> {
             overflow: TextOverflow.ellipsis,
           ),
           items: [
-             DropdownMenuItem<String>(
+            DropdownMenuItem<String>(
               value: '-1',
               enabled: false,
-           child: Text(
-               'Select Operator',
-               style: CommonStyles.txStyF15CbFF6.copyWith(
-                 color: CommonStyles.colorGrey,
-               ),
-           ),
-             ),
-
-
+              child: Text(
+                'Select Operator',
+                style: CommonStyles.txStyF15CbFF6.copyWith(
+                  color: CommonStyles.colorGrey,
+                ),
+              ),
+            ),
             ...data.map(
               (Map<String, dynamic> value) => DropdownMenuItem<String>(
                 value: value['name'],
@@ -881,7 +887,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
     print("🌐 API URL: $apiUrl");
     print("🌐networkAvailable: $networkAvailable");
     if (networkAvailable) {
-    //  _showProgressBar(context, "Please wait...");
+      //  _showProgressBar(context, "Please wait...");
 
       try {
         Map<String, dynamic> requestBody = sendObj(lineId);
@@ -892,24 +898,22 @@ class _RejectPipelineState extends State<RejectPipeline> {
         );
         print("requestBody: ${jsonEncode(requestBody)}");
         print("Response Status Code: ${response.statusCode}");
-       // _hideProgressBar(context);
+        // _hideProgressBar(context);
 
         if (response.statusCode == 200) {
           print("✅ Data successfully sent to cloud!");
-     //     await saveDataInDb(lineId);
+          //     await saveDataInDb(lineId);
         } else {
           print("❌ Failed to send data: ${response.body}");
         }
       } catch (e) {
         print("❌ Error sending data: $e");
-      //  _hideProgressBar(context);
+        //  _hideProgressBar(context);
       }
     } else {
       await saveDataInDb(lineId);
     }
   }
-
-
 
   void _showProgressBar(BuildContext context, String message) {
     showDialog(
@@ -1032,24 +1036,23 @@ class _RejectPipelineState extends State<RejectPipeline> {
   //   );
   // }
 
-
-
-  // Function to handle form submission
   void _handleSubmit() {
     if (!_validateUnit()) {
-      CommonUtils.showErrorToast(context,'Please select an unit.');
+      CommonUtils.showErrorToast(context, 'Please select a unit.');
       return;
     }
     if (!_validateDeficiencyType()) {
-      CommonUtils.showErrorToast(context,'Please select at least one deficiency type.');
+      CommonUtils.showErrorToast(
+          context, 'Please select at least one deficiency type.');
       return;
     }
     if (!_validateOperator()) {
-      CommonUtils.showErrorToast(context,'Please select an operator.');
+      CommonUtils.showErrorToast(context, 'Please select an operator.');
       return;
     }
     if (!_validateCorrectiveAction()) {
-      CommonUtils.showErrorToast(context,'Please select at least one corrective action.');
+      CommonUtils.showErrorToast(
+          context, 'Please select at least one corrective action.');
       return;
     }
     print("Note Entered: ${noteController.text}");
@@ -1061,7 +1064,33 @@ class _RejectPipelineState extends State<RejectPipeline> {
     print(
         'Selected Corrective Actions: ${selectedItems.map((e) => e['name']).join(', ')}');
     // _showConfirmationDialog();
-    shoWMoreDeficienciesDialog(context);
+    // shoWMoreDeficienciesDialog(context);
+    CommonUtils.showCustomDialog(
+      context,
+      title: 'InspectionPro',
+      content: 'Do you want add more deficiencies',
+      onCancel: () {
+        Navigator.pop(context);
+        sendDataToCloud(widget.lineId);
+        /*  Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        ); */
+        Navigator.pop(context);
+      },
+      onSubmit: () {
+        Navigator.pop(context);
+        setState(() {
+          selectedDdUnitID = null;
+          selectedDdUnit = null;
+          selectedDdOperator = null;
+          selectedItems.clear();
+          selectedItemsdiff.clear();
+
+          deficiencyCount = deficiencyCount + 1;
+        });
+      },
+    );
     //   sendDataToCloud('${widget.lineId}');
   }
 

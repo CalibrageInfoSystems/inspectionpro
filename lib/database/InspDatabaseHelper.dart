@@ -1,11 +1,8 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'dart:io';
-import 'dart:typed_data';
 
 class InspDatabaseHelper {
   static const String _databaseName = "inspection.sqlite";
@@ -357,7 +354,7 @@ class InspDatabaseHelper {
 
     final db = await database;// Ensure database is initialized
 
-    final List<Map<String, dynamic>> result = await db!.rawQuery(
+    final List<Map<String, dynamic>> result = await db.rawQuery(
       "SELECT name FROM savedData ORDER BY _id",
     );
 

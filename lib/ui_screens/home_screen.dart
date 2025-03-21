@@ -58,32 +58,32 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       fetchData();
 
-     //  debugPrint("Fetching data from database");
-     //
-     //  final dbHelper = InspDatabaseHelper();
-     //
-     //  await Future.delayed(Duration.zero, () async {
-     //    await dbHelper.clearTable('lines');
-     //
-     //
-     //
-     // linesData = await dbHelper.getLines();
-     //
-     //    for (var line in linesData) {
-     //      if (!line.status) {
-     //     failedLinesData.add(line);
-     //      }
-     //    }
-     //
-     //
-     //    debugPrint("check size... ${linesData.length}");
-
+      //  debugPrint("Fetching data from database");
+      //
+      //  final dbHelper = InspDatabaseHelper();
+      //
+      //  await Future.delayed(Duration.zero, () async {
+      //    await dbHelper.clearTable('lines');
+      //
+      //
+      //
+      // linesData = await dbHelper.getLines();
+      //
+      //    for (var line in linesData) {
+      //      if (!line.status) {
+      //     failedLinesData.add(line);
+      //      }
+      //    }
+      //
+      //
+      //    debugPrint("check size... ${linesData.length}");
 
       // Delay toast until after the first frame to avoid context issues
 
-    //  });
+      //  });
+    }
   }
-  }
+
   Future<void> getAppInfo() async {
     setState(() {
       isLoading = true; // Start loading
@@ -104,10 +104,8 @@ class _HomeScreenState extends State<HomeScreen> {
         Fluttertoast.showToast(msg: "Data saved successfully!");
         await fetchData(); // Fetch updated data
       } else {
-
         Fluttertoast.showToast(msg: jsonResponse.body);
         throw Exception(jsonResponse.body);
-
       }
     } catch (e) {
       Fluttertoast.showToast(msg: "Error: ${e.toString()}");
@@ -157,10 +155,20 @@ class _HomeScreenState extends State<HomeScreen> {
             /// **Second Custom Icon (Lock)**
             IconButton(
               onPressed: () {
-                logOutDialog(context);
+                // logOutDialog(context);
+                CommonUtils.showCustomDialog(
+                  context,
+                  title: 'Confirmation',
+                  content: 'Do you want to logout?',
+                  onCancel: () => Navigator.of(context).pop(),
+                  onSubmit: () {
+                    Navigator.of(context).pop();
+                    onConfirmLogout();
+                  },
+                );
               },
               icon: Image.asset(
-                Assets.images.logout.path, // Load from assets
+                Assets.images.logout.path,
                 width: 24,
                 height: 24,
                 color: Colors.white,
@@ -642,7 +650,6 @@ class _HomeScreenState extends State<HomeScreen> {
     if (networkAvailable) {
       bool syncReady = await makeSyncReady();
 
-
       if (!syncReady) {
         // _hideProgressBar(context);
         return;
@@ -658,8 +665,7 @@ class _HomeScreenState extends State<HomeScreen> {
               success ? "Sync successful" : "Sync failed. Please try again."),
         ),
       );
-    }
-    else{
+    } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         CommonUtils.showErrorToast(context, "Please check internet connection");
       });

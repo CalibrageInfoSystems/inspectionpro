@@ -10,13 +10,13 @@ class CommonStyles {
   static const txStyF15CbFF6 = TextStyle(
     fontSize: 15,
     fontFamily: FontFamily.roboto,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
     color: colorBlack,
   );
   static const txStyF15CgFF6 = TextStyle(
     fontSize: 15,
     fontFamily: FontFamily.roboto,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w500,
     color: colorGrey,
   );
 }

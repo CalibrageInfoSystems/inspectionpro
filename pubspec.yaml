@@ -44,6 +44,7 @@ dependencies:
   internet_connection_checker: ^1.0.0+1
 
 
+  path: any
 dev_dependencies:
   build_runner: null
   flutter_gen_runner: null
@@ -78,4 +79,16 @@ flutter:
   fonts:
     - family: Roboto
       fonts:
+        - asset: assets/fonts/Roboto-Light.ttf
+          weight: 200
+        - asset: assets/fonts/Roboto-ExtraLight.ttf
+          weight: 300
+        - asset: assets/fonts/Roboto-Regular.ttf
+          weight: 400
         - asset: assets/fonts/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+        

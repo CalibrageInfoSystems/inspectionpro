@@ -1076,7 +1076,11 @@ class _RejectPipelineState extends State<RejectPipeline> {
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
         ); */
-        Navigator.pop(context);
+        // Navigator.pop(context, true);
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
+            (route) => false);
       },
       onSubmit: () {
         Navigator.pop(context);

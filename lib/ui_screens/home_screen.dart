@@ -3,19 +3,16 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:inspectionpro/models/appinfo_model.dart';
 
 import 'package:inspectionpro/ui_screens/login_screen.dart';
 import 'package:inspectionpro/ui_screens/reject_pipeline.dart';
 import 'package:inspectionpro/ui_screens/splash_screen.dart';
 import 'package:inspectionpro/utils/api_config.dart';
 import 'package:http/http.dart' as http;
+import 'package:inspectionpro/utils/styles.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
-import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
-import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../database/InspDatabaseHelper.dart';
 import '../gen/assets.gen.dart';
@@ -48,8 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _loadUserData();
     getAppInfo();
-
   }
+
   Future<void> getAppInfo() async {
     setState(() {
       isLoading = true; // Start loading
@@ -82,147 +79,143 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xFF212121),
-          title: Row(
-            children: [
-              /// **App Logo from Assets**
-              Image.asset(
-                'assets/images/app_logo_512.png',  // Your logo path
-                width: 40,
-                height: 40,
-              ),
-              const SizedBox(width: 8),
+      backgroundColor: CommonStyles.colorWhite,
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF212121),
+        title: Row(
+          children: [
+            /// **App Logo from Assets**
+            Image.asset(
+              'assets/images/app_logo_512.png',
+              width: 40,
+              height: 40,
+            ),
+            const SizedBox(width: 8),
 
-              /// **App Name**
-              const Text(
-                'InspectionPro',
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              const Spacer(),
+            /// **App Name**
+            const Text(
+              'InspectionPro',
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            const Spacer(),
 
-              /// **First Custom Icon (Sync)**
-              IconButton(
-                onPressed: _onSyncPressed,
-                icon: Image.asset(
-                  Assets.images.sync.path,
-                  width: 24,
-                  height: 24,
-                  color: Colors.white,  // Optional: Color overlay
-                ),
+            /// **First Custom Icon (Sync)**
+            IconButton(
+              onPressed: _onSyncPressed,
+              icon: Image.asset(
+                Assets.images.sync.path,
+                width: 24,
+                height: 24,
+                color: Colors.white, // Optional: Color overlay
               ),
+            ),
 
-              const SizedBox(width: 6),
+            const SizedBox(width: 6),
 
-              /// **Second Custom Icon (Lock)**
-              IconButton(
-                onPressed: () {
-                  logOutDialog(context);
-                },
-                icon: Image.asset(
-                  Assets.images.logout.path,// Load from assets
-                  width: 24,
-                  height: 24,
-                  color: Colors.white,
-                ),
+            /// **Second Custom Icon (Lock)**
+            IconButton(
+              onPressed: () {
+                logOutDialog(context);
+              },
+              icon: Image.asset(
+                Assets.images.logout.path, // Load from assets
+                width: 24,
+                height: 24,
+                color: Colors.white,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        body:
-        Container(
-          color: const Color(0xFFF5F5F5),
-          child: Column(
-            children: [
-              Container(
-                alignment: Alignment.centerRight,
-                color: const Color.fromARGB(255, 153, 153, 153),
-                padding: const EdgeInsets.all(8.0),
-                child:  Text(
-                  'FACILITY: $applicationName / USER: $userName',
-                  style: TextStyle(fontSize: 16),
-                ),
+      ),
+      body: Container(
+        color: const Color(0xFFF5F5F5),
+        child: Column(
+          children: [
+            Container(
+              alignment: Alignment.centerRight,
+              color: const Color.fromARGB(255, 153, 153, 153),
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'FACILITY: $applicationName / USER: $userName',
+                style: const TextStyle(fontSize: 16),
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => showFailedOnly = false),
-                        child: Container(
-                          width: double.infinity,
-                          child: _buildTab('All : ${lines.length}', Colors.grey),
-                        ),
-                      ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => showFailedOnly = false),
+                      child: _buildTab('All : ${lines.length}', Colors.grey),
                     ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: Container(
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: _buildTab('Unsaved : 0', Colors.blue),
+                  ),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => showFailedOnly = true),
+                      child: SizedBox(
                         width: double.infinity,
-                        child: _buildTab('Unsaved : 0', Colors.blue),
+                        child: _buildTab(
+                            'Failed : ${failedLinesData.length}', Colors.red),
                       ),
                     ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => showFailedOnly = true),
-                        child: Container(
-                          width: double.infinity,
-                          child: _buildTab('Failed : ${failedLinesData.length}', Colors.red),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: isLoading
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator()) // Show loader while data loads
+                  : (showFailedOnly ? failedLinesData : lines).isEmpty
+                      ? const Center(child: Text("No data found"))
+                      : ListView.builder(
+                          itemCount: showFailedOnly
+                              ? failedLinesData.length
+                              : lines.length,
+                          itemBuilder: (context, index) {
+                            final item = showFailedOnly
+                                ? failedLinesData[index]
+                                : lines[index];
+                            return buildItem(item); // Pass data to `buildItem`
+                          },
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-
-              Expanded(
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator()) // Show loader while data loads
-                    : (showFailedOnly ? failedLinesData : lines).isEmpty
-                    ? const Center(child: Text("No data found"))
-                    : ListView.builder(
-                  itemCount: showFailedOnly ? failedLinesData.length : lines.length,
-                  itemBuilder: (context, index) {
-                    final item = showFailedOnly ? failedLinesData[index] : lines[index];
-                    return buildItem(item); // Pass data to `buildItem`
-                  },
-                ),
-              ),
-            ],
-          ),
-        )
+            ),
+          ],
+        ),
+      ),
     );
   }
 
-  Widget _buildTab(String label,  Color color) {
-    return Expanded(
-      child: Container(
-        height: 70,
-        alignment: Alignment.center,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          '$label',
-          style: const TextStyle(color: Colors.white),
-        ),
+  Widget _buildTab(String label, Color color) {
+    return Container(
+      height: 70,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(color: Colors.white),
       ),
     );
   }
 
   /// **UI for Each Line Item**
   Widget buildItem(Map<String, dynamic> line) {
-    String formattedDate = getProperDate(line['lastExecuted'] );
+    String formattedDate = getProperDate(line['lastExecuted']);
     print('formattedDate: $formattedDate');
     return Container(
       padding: const EdgeInsets.all(10),
@@ -239,7 +232,10 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Text(
                 line['name'],
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16,fontFamily: 'roboto'),
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    fontFamily: 'roboto'),
               ),
               const SizedBox(height: 5),
               RichText(
@@ -247,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     TextSpan(
                       text: '$formattedDate   ',
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black54,
                         fontFamily: 'Roboto',
                       ),
@@ -255,14 +251,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     TextSpan(
                       text: line['status'] == 1 ? 'Passed' : 'Failed',
                       style: TextStyle(
-                        color: line['status'] == 1 ? Colors.black54 : Colors.red,
+                        color:
+                            line['status'] == 1 ? Colors.black54 : Colors.red,
                         fontFamily: 'Roboto',
                       ),
                     ),
                   ],
                 ),
               )
-
             ],
           ),
 
@@ -271,9 +267,8 @@ class _HomeScreenState extends State<HomeScreen> {
           /// **Thumbs Up & Down Buttons**
           IconButton(
             onPressed: () {
-
               print("Approved: ${line['name']}");
-              SenddataCloud(line['lineId'],context);
+              SenddataCloud(line['lineId'], context);
               //  saveDataInDb(line['lineId']);
             },
             style: IconButton.styleFrom(
@@ -287,14 +282,16 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             onPressed: () {
               String lineId = line['lineId'].toString();
-              String name = line['name'].toString(); // Assuming `name` exists in line
+              String name =
+                  line['name'].toString(); // Assuming `name` exists in line
 
               print("Rejected: $lineId, Name: $name");
 
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RejectPipeline(lineId: lineId, name: name),
+                  builder: (context) =>
+                      RejectPipeline(lineId: lineId, name: name),
                 ),
               );
             },
@@ -305,12 +302,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             icon: const Icon(Icons.thumb_down, color: Colors.red, size: 20),
           )
-
         ],
       ),
     );
   }
-
 
   /// Fetch Data from SQLite
   ///
@@ -371,8 +366,9 @@ class _HomeScreenState extends State<HomeScreen> {
               fontFamily: 'roboto',
             ),
           ),
-          content: const Text('Are You Sure You Want to Logout?',
-            style:TextStyle(
+          content: const Text(
+            'Are You Sure You Want to Logout?',
+            style: TextStyle(
               fontSize: 18,
               color: Colors.black,
               fontWeight: FontWeight.w600,
@@ -412,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onConfirmLogout();
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor:  Colors.blue, // Use 'col' or fallback to blue
+                backgroundColor: Colors.blue, // Use 'col' or fallback to blue
                 side: BorderSide(
                   color: HexColor.fromHex('#33AADD'),
                 ),
@@ -442,10 +438,9 @@ class _HomeScreenState extends State<HomeScreen> {
     prefs.remove('userRoleId');
     Fluttertoast.showToast(msg: "Logout Successfully!");
 
-
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-          (route) => false,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
     );
   }
 
@@ -487,7 +482,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // Delete existing data if found
         if (existingData.isNotEmpty) {
-          await txn.delete("savedData", where: "lineId = ?", whereArgs: [lineId]);
+          await txn
+              .delete("savedData", where: "lineId = ?", whereArgs: [lineId]);
           print("🗑 Existing data deleted for lineId: $lineId");
         }
 
@@ -502,7 +498,8 @@ class _HomeScreenState extends State<HomeScreen> {
             [1, lineId],
           );
           if (rowsAffected > 0) {
-            print("✅ Status updated for lineId: $lineId ($rowsAffected rows affected)");
+            print(
+                "✅ Status updated for lineId: $lineId ($rowsAffected rows affected)");
           } else {
             print("❌ Status update failed for lineId: $lineId");
             await debugTableContents();
@@ -524,7 +521,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => isLoading = false); // Hide loading indicator
   }
 
-
   Map<String, dynamic> sendObj(String lineId) {
     print("check..lineId..$lineId");
 
@@ -544,6 +540,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print(row);
     }
   }
+
   /// **Send Liked Data to Cloud**
   Future<void> SenddataCloud(String lineId, BuildContext context) async {
     bool networkAvailable = await isNetworkAvailable();
@@ -580,6 +577,7 @@ class _HomeScreenState extends State<HomeScreen> {
       await saveDataInDb(lineId);
     }
   }
+
   Future<bool> isNetworkAvailable() async {
     var connectivityResult = await Connectivity().checkConnectivity();
     print("🔍 Connectivity Check: $connectivityResult"); // Debug log
@@ -603,13 +601,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     bool syncReady = await makeSyncReady();
     if (!syncReady) {
-     // _hideProgressBar(context);
+      // _hideProgressBar(context);
       return;
     }
 
     bool success = await dbHelper.clearOldData();
 
- //   _hideProgressBar(context);
+    //   _hideProgressBar(context);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -628,7 +626,6 @@ class _HomeScreenState extends State<HomeScreen> {
       print('sp : $sp');
       try {
         await pendingdatasyncCloud(sp);
-
       } catch (e) {
         print("Error: $e");
         _hideProgressBar(context);
@@ -637,7 +634,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _hideProgressBar(context);
     return true;
   }
-
 
   Future<void> pendingdatasyncCloud(String sp) async {
     print("Pending Data Sync: $sp");
@@ -655,7 +651,9 @@ class _HomeScreenState extends State<HomeScreen> {
       Map<String, dynamic> requestBody = jsonDecode(sp);
 
       // Ensure `transactionId` is properly handled
-      requestBody["transactionId"] = requestBody["transactionId"] == "null" ? null : requestBody["transactionId"];
+      requestBody["transactionId"] = requestBody["transactionId"] == "null"
+          ? null
+          : requestBody["transactionId"];
 
       print("📤 Request Body: ${jsonEncode(requestBody)}");
 
@@ -680,8 +678,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-
-
 /// **Show Progress Bar (Uses Dialog)**
 void _showProgressBar(BuildContext context, String message) {
   showDialog(
@@ -691,7 +687,7 @@ void _showProgressBar(BuildContext context, String message) {
       return AlertDialog(
         content: Row(
           children: [
-            CircularProgressIndicator(),
+            const CircularProgressIndicator(),
             const SizedBox(width: 20),
             Text(message),
           ],
@@ -705,7 +701,3 @@ void _showProgressBar(BuildContext context, String message) {
 void _hideProgressBar(BuildContext context) {
   Navigator.of(context, rootNavigator: true).pop();
 }
-
-
-
-

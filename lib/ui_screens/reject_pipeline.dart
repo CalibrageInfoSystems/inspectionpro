@@ -222,109 +222,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
     );
   }
 
-  void shoWMoreDeficienciesDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext dialogContext) {
-        // Store dialog context separately
-        return Dialog(
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                width: double.infinity,
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(10),
-                child: Text(
-                  'InspectionPro',
-                  style: CommonStyles.txStyF15CbFF6.copyWith(
-                    fontSize: 20,
-                    color: CommonStyles.colorBlue,
-                  ),
-                ),
-              ),
-              const Divider(
-                color: CommonStyles.colorBlue,
-              ),
-              // Content with message
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                child: Text(
-                  'Do you want to add more deficiencies?',
-                  style: CommonStyles.txStyF15CbFF6.copyWith(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w200,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              // Buttons
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: CustomButton(
-                        btnText: 'No',
-                        backgroundColor: CommonStyles.colorBlue,
-                        onPressed: () async {
-                          Navigator.pop(dialogContext); // Close dialog first
 
-                          await sendDataToCloud(
-                              widget.lineId); // Wait for data upload
-
-                          if (context.mounted) {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomeScreen(),
-                              ),
-                            );
-                          }
-                        },
-                        btnStyle:
-                            const TextStyle(color: Colors.white, fontSize: 15),
-                      ),
-                    ),
-                    const SizedBox(width: 25),
-                    Expanded(
-                      child: CustomButton(
-                        btnText: 'Yes',
-                        backgroundColor: CommonStyles.colorBlue,
-                        onPressed: () {
-                          Navigator.pop(dialogContext);
-                          setState(() {
-                            selectedDdUnitID = null;
-                            selectedDdUnit = null;
-                            selectedDdOperator = null;
-                            selectedItems.clear();
-                            selectedItemsdiff.clear();
-                            noteController.clear();
-                            deficiencyCount = deficiencyCount + 1;
-                          });
-                        },
-                        btnStyle:
-                            const TextStyle(color: Colors.white, fontSize: 15),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
   Padding note() {
     return Padding(
@@ -910,7 +808,8 @@ class _RejectPipelineState extends State<RejectPipeline> {
         print("❌ Error sending data: $e");
         //  _hideProgressBar(context);
       }
-    } else {
+    }
+    else {
       await saveDataInDb(lineId);
     }
   }
@@ -950,6 +849,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
           "lineId": lineId,
           "name": jsonEncode(sendObj(lineId)), // Convert JSON to String
         };
+        print("✅ dataMap ===: $dataMap");
 
         // Check if data exists
         List<Map<String, dynamic>> existingData = await txn.query(
@@ -959,11 +859,11 @@ class _RejectPipelineState extends State<RejectPipeline> {
         );
 
         // Delete existing data if found
-        if (existingData.isNotEmpty) {
-          await txn
-              .delete("savedData", where: "lineId = ?", whereArgs: [lineId]);
-          print("🗑 Existing data deleted for lineId: $lineId");
-        }
+        // if (existingData.isNotEmpty) {
+        //   await txn
+        //       .delete("savedData", where: "lineId = ?", whereArgs: [lineId]);
+        //   print("🗑 Existing data deleted for lineId: $lineId");
+        // }
 
         // Insert new data
         int insertedId = await txn.insert("savedData", dataMap);
@@ -1038,7 +938,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
 
   void _handleSubmit() {
     if (!_validateUnit()) {
-      CommonUtils.showErrorToast(context, 'Please select a unit.');
+      CommonUtils.showErrorToast(context, 'Please select an unit.');
       return;
     }
     if (!_validateDeficiencyType()) {
@@ -1082,84 +982,24 @@ class _RejectPipelineState extends State<RejectPipeline> {
             MaterialPageRoute(builder: (context) => const HomeScreen()),
             (route) => false);
       },
-      onSubmit: () {
+      onSubmit: () async {
         Navigator.pop(context);
-        setState(() {
+       await sendDataToCloud(widget.lineId);
+
+       setState(() {
           selectedDdUnitID = null;
           selectedDdUnit = null;
           selectedDdOperator = null;
           selectedItems.clear();
           selectedItemsdiff.clear();
-
+          noteController.clear();
           deficiencyCount = deficiencyCount + 1;
-        });
+          FocusScope.of(context).unfocus();
+    });
       },
     );
     //   sendDataToCloud('${widget.lineId}');
   }
 
-  Future<void> _showConfirmationDialog() async {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Center(
-            child: Text(
-              "InspectionPro",
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, color: CommonStyles.colorBlue),
-            ),
-          ),
-          content: const Text("Do you want to add more deficiencies?"),
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      sendDataToCloud(widget.lineId);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomeScreen()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CommonStyles.colorBlue,
-                    ),
-                    child:
-                        const Text("No", style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      setState(() {
-                        selectedDdUnitID = null;
-                        selectedDdUnit = null;
-                        selectedDdOperator = null;
-                        selectedItems.clear();
-                        selectedItemsdiff.clear();
 
-                        deficiencyCount = deficiencyCount + 1;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: CommonStyles.colorBlue,
-                    ),
-                    child: const Text("Yes",
-                        style: TextStyle(color: Colors.white)),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        );
-      },
-    );
-  }
 }

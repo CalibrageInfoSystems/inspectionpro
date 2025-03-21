@@ -45,16 +45,21 @@ class CommonUtils {
     );
   }
 
-  static void showErrorToast(context, String message) {
+  static void showErrorToast(BuildContext context, String message, {bool isError = true}) {
     FToast fToast = FToast();
     fToast.init(context);
+
+    // Determine the color and icon based on error/success
+    Color borderColor = isError ? Colors.red : Colors.green;
+    Color iconColor = isError ? Colors.red : Colors.green;
+    IconData iconData = isError ? Icons.error : Icons.check_circle;
 
     Widget toast = Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.red, width: 2), // Add border color
+        border: Border.all(color: borderColor, width: 2), // Border color changes
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -63,16 +68,22 @@ class CommonUtils {
           ),
         ],
       ),
-      child: Row(
+      child:
+      Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.error, color: Colors.red),
+          Icon(iconData, color: iconColor, size: 24), // Dynamic icon
           const SizedBox(width: 8),
           Expanded(
-            child: Text(
+
+            child:Text(
               message,
+              textAlign: TextAlign.center, // Corrected placement
               style: const TextStyle(
-                  color: Colors.black, fontSize: 20, fontFamily: 'roboto'),
+                color: Colors.black,
+                fontSize: 16,
+                fontFamily: 'Roboto',
+              ),
             ),
           ),
         ],
@@ -81,7 +92,7 @@ class CommonUtils {
 
     fToast.showToast(
       child: toast,
-      gravity: ToastGravity.CENTER, // Change position
+      gravity: ToastGravity.BOTTOM, // Change position
       toastDuration: const Duration(seconds: 3),
     );
   }

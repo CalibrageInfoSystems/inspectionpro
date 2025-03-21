@@ -101,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
         await dbHelper.insertLineValues(data['values']);
         await dbHelper.insertOperators(data['operators']);
 
-        Fluttertoast.showToast(msg: "Data saved successfully!");
+     //   Fluttertoast.showToast(msg: "Data saved successfully!");
         await fetchData(); // Fetch updated data
       } else {
         Fluttertoast.showToast(msg: jsonResponse.body);
@@ -658,16 +658,18 @@ class _HomeScreenState extends State<HomeScreen> {
       bool success = await dbHelper.clearOldData();
 
       //   _hideProgressBar(context);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              success ? "Sync successful" : "Sync failed. Please try again."),
-        ),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        CommonUtils.showErrorToast(context,   success ? "Sync successful" : "Sync failed. Please try again.",isError: false);
+      });
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text(
+      //         success ? "Sync successful" : "Sync failed. Please try again."),
+      //   ),
+      // );
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        CommonUtils.showErrorToast(context, "Please check internet connection");
+        CommonUtils.showErrorToast(context, "Please check internet connection",isError: true);;
       });
     }
   }

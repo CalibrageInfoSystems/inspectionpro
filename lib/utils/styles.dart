@@ -3,6 +3,7 @@ import 'package:inspectionpro/gen/fonts.gen.dart';
 
 class CommonStyles {
   static const colorBlack = Colors.black;
+  static const colorWhite = Colors.white;
   static const colorGrey = Colors.grey;
   static const colorBlue = Colors.blue;
 

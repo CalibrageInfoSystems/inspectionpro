@@ -38,11 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       bool isConnected = await CommonUtils.checkInternetConnectivity();
       if (!isConnected) {
-        Fluttertoast.showToast(
-            msg: 'No internet connection, Please try again.');
-        FocusScope.of(context).unfocus();
-        Navigator.of(context).pop();
-        return;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          CommonUtils.showErrorToast(context, "Please check internet connection");
+        });
       }
 
       const apiUrl = '$baseUrl$login';

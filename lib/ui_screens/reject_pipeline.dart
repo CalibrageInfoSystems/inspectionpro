@@ -969,7 +969,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
         if (insertedId > 0) {
           int rowsAffected = await txn.rawUpdate(
             "UPDATE lines SET status = ? WHERE lineId = ?",
-            [1, lineId],
+            [0, lineId],
           );
           if (rowsAffected > 0) {
             print(

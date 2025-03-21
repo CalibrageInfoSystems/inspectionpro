@@ -57,11 +57,32 @@ class _HomeScreenState extends State<HomeScreen> {
       getAppInfo();
     } else {
       fetchData();
+
+     //  debugPrint("Fetching data from database");
+     //
+     //  final dbHelper = InspDatabaseHelper();
+     //
+     //  await Future.delayed(Duration.zero, () async {
+     //    await dbHelper.clearTable('lines');
+     //
+     //
+     //
+     // linesData = await dbHelper.getLines();
+     //
+     //    for (var line in linesData) {
+     //      if (!line.status) {
+     //     failedLinesData.add(line);
+     //      }
+     //    }
+     //
+     //
+     //    debugPrint("check size... ${linesData.length}");
+
+
       // Delay toast until after the first frame to avoid context issues
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        CommonUtils.showErrorToast(context, "Please check internet connection");
-      });
-    }
+
+    //  });
+  }
   }
   Future<void> getAppInfo() async {
     setState(() {
@@ -616,23 +637,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _onSyncPressed() async {
     // _showProgressBar(context, "Syncing...");
+    bool networkAvailable = await CommonUtils.isNetworkAvailable();
 
-    bool syncReady = await makeSyncReady();
-    if (!syncReady) {
-      // _hideProgressBar(context);
-      return;
+    if (networkAvailable) {
+      bool syncReady = await makeSyncReady();
+
+
+      if (!syncReady) {
+        // _hideProgressBar(context);
+        return;
+      }
+
+      bool success = await dbHelper.clearOldData();
+
+      //   _hideProgressBar(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              success ? "Sync successful" : "Sync failed. Please try again."),
+        ),
+      );
     }
-
-    bool success = await dbHelper.clearOldData();
-
-    //   _hideProgressBar(context);
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-            success ? "Sync successful" : "Sync failed. Please try again."),
-      ),
-    );
+    else{
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        CommonUtils.showErrorToast(context, "Please check internet connection");
+      });
+    }
   }
 
   Future<bool> makeSyncReady() async {

@@ -222,8 +222,6 @@ class _RejectPipelineState extends State<RejectPipeline> {
     );
   }
 
-
-
   Padding note() {
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -241,6 +239,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
           CustomTextfield(
             controller: noteController, // Assign controller here
             maxLines: 4,
+            maxLength: 250,
             focusBorderColor: CommonStyles.colorGrey[500],
           ),
         ],
@@ -808,8 +807,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
         print("❌ Error sending data: $e");
         //  _hideProgressBar(context);
       }
-    }
-    else {
+    } else {
       await saveDataInDb(lineId);
     }
   }
@@ -984,9 +982,9 @@ class _RejectPipelineState extends State<RejectPipeline> {
       },
       onSubmit: () async {
         Navigator.pop(context);
-       await sendDataToCloud(widget.lineId);
+        await sendDataToCloud(widget.lineId);
 
-       setState(() {
+        setState(() {
           selectedDdUnitID = null;
           selectedDdUnit = null;
           selectedDdOperator = null;
@@ -995,11 +993,9 @@ class _RejectPipelineState extends State<RejectPipeline> {
           noteController.clear();
           deficiencyCount = deficiencyCount + 1;
           FocusScope.of(context).unfocus();
-    });
+        });
       },
     );
     //   sendDataToCloud('${widget.lineId}');
   }
-
-
 }

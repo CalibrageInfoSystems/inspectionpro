@@ -12,6 +12,7 @@ class CustomTextfield extends StatelessWidget {
   final FocusNode? focusNode;
   final Color? focusBorderColor;
   final int? maxLines;
+  final int? maxLength;
 
   const CustomTextfield({
     super.key,
@@ -25,6 +26,7 @@ class CustomTextfield extends StatelessWidget {
     this.onChanged,
     this.maxLines = 1,
     this.focusNode,
+    this.maxLength,
   });
 
   @override
@@ -36,6 +38,7 @@ class CustomTextfield extends StatelessWidget {
       focusNode: focusNode,
       validator: validator,
       maxLines: maxLines,
+      maxLength: maxLength,
       decoration: InputDecoration(
           filled: filled,
           fillColor: fillColor,

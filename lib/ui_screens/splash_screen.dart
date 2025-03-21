@@ -8,8 +8,10 @@ import '../database/InspDatabaseHelper.dart';
 import 'home_screen.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  State<SplashScreen> createState() => _SplashScreenState();
 }
 
 class _SplashScreenState extends State<SplashScreen> {
@@ -19,13 +21,15 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _initializationFuture = _initializeApp();
+    _initializeApp();
+    Future.delayed(const Duration(seconds: 2), () {
+      _checkLoginStatus();
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Preload the image after the context is available
     precacheImage(AssetImage(Assets.images.appLogo512.path), context);
   }
 
@@ -33,43 +37,94 @@ class _SplashScreenState extends State<SplashScreen> {
     try {
       _inspDatabaseHelper = InspDatabaseHelper();
       await _inspDatabaseHelper!.createDatabase();
-      await Future.delayed(Duration(seconds: 1));
     } catch (e) {
       print("Error initializing database: $e");
     }
-    await _checkLoginStatus();
   }
 
   Future<void> _checkLoginStatus() async {
+    print('_checkLoginStatus: 1111');
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool isLogin = prefs.getBool("isLoggedIn") ?? false;
 
     // Navigate based on login status after the build is complete
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => isLogin ? HomeScreen() : LoginScreen()),
-      );
-    });
+    print('_checkLoginStatus: 2222');
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>
+              isLogin ? const HomeScreen() : const LoginScreen()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Center(
+          child: Image.asset(
+            Assets.images.inspectionproTitleCaption.path,
+            width: double.infinity,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ),
+    );
+  }
+/*   @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: TweenAnimationBuilder<double>(
+          tween: Tween<double>(begin: 60, end: 230),
+          duration: const Duration(seconds: 2),
+          curve: Curves.easeIn,
+          builder: (context, size, child) {
+            return Center(
+              child: Image.asset(
+                Assets.images.inspectionproTitleCaption.path,
+                width: size,
+                height: size,
+                fit: BoxFit.contain,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  } */
+
+/*   @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Image.asset(
+        Assets.images.inspectionproTitleCaption.path,
+        width: 60,
+        height: 60,
+        fit: BoxFit.contain,
+      ),
+    );
+    /* return _buildUI();
+    /* FutureBuilder(
       future: _initializationFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           return _buildUI();
-        } else {
+        } else if (snapshot.connectionState == ConnectionState.done){
+
+        } 
+        else {
           return Scaffold(
             backgroundColor: HexColor.fromHex('#272A33'),
             body: const Center(child: CircularProgressIndicator()),
           );
         }
       },
-    );
-  }
+    ); */ */
+  } */
 
   Widget _buildUI() {
     return Scaffold(

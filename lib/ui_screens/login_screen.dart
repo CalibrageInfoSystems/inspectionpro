@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:inspectionpro/ui_screens/home_screen.dart';
-import 'package:inspectionpro/ui_screens/splash_screen.dart';
 import 'package:inspectionpro/utils/api_config.dart';
 import 'package:inspectionpro/utils/commonutils.dart';
 import 'package:inspectionpro/widgets/custom_textfield.dart';
@@ -156,8 +155,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ), */
                     Image.asset(
-                      Assets.images.mainLogo.path,
-                      width: MediaQuery.of(context).size.width * 0.8,
+                      Assets.images.inspectionproTitleCaption.path,
+                      width: MediaQuery.of(context).size.width,
                     ),
 
                     const SizedBox(height: 40),

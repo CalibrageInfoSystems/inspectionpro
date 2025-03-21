@@ -1,5 +1,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 
 class CommonUtils {
   static const dropdownListBgColor = Color(0xff6f6f6f);
@@ -40,7 +42,54 @@ class CommonUtils {
       },
     );
   }
+  static void showErrorToast(context, String message) {
+    FToast fToast = FToast();
+    fToast.init(context);
 
+    Widget toast = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.red, width: 2), // Add border color
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.error, color: Colors.red),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.black, fontSize: 20,fontFamily: 'roboto'),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    fToast.showToast(
+      child: toast,
+      gravity: ToastGravity.CENTER, // Change position
+      toastDuration: const Duration(seconds: 3),
+    );
+  }
+ static Future<bool> isNetworkAvailable() async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    print("🔍 Connectivity Check: $connectivityResult"); // Debug log
+
+    bool hasInternet = await InternetConnectionChecker().hasConnection;
+    print("🌐 Actual Internet Connection: $hasInternet"); // Debug log
+
+    return hasInternet;
+  }
 /*   static void showLoadingDialog22(BuildContext context,
       {String? status = 'Please wait...'}) {
     showDialog(

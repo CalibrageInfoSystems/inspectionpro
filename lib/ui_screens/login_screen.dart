@@ -226,14 +226,14 @@ class _LoginScreenState extends State<LoginScreen> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
-          /*  if (formKey.currentState!.validate()) {
+          // Navigator.pushReplacement(
+          //   context,
+          //   MaterialPageRoute(builder: (context) => const HomeScreen()),
+          // );
+     if (formKey.currentState!.validate()) {
             CommonUtils.showLoadingDialog(context);
             signin();
-          } */
+          }
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF42A5F5),

@@ -16,6 +16,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../database/InspDatabaseHelper.dart';
 import '../gen/assets.gen.dart';
+import '../utils/commonutils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -41,12 +42,27 @@ class _HomeScreenState extends State<HomeScreen> {
   String userName = "";
   String applicationName = "";
   @override
+  @override
   void initState() {
     super.initState();
-    _loadUserData();
-    getAppInfo();
+    _initialize();
   }
 
+  void _initialize() async {
+    _loadUserData();
+
+    bool networkAvailable = await CommonUtils.isNetworkAvailable();
+
+    if (networkAvailable) {
+      getAppInfo();
+    } else {
+      fetchData();
+      // Delay toast until after the first frame to avoid context issues
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        CommonUtils.showErrorToast(context, "Please check internet connection");
+      });
+    }
+  }
   Future<void> getAppInfo() async {
     setState(() {
       isLoading = true; // Start loading
@@ -67,8 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
         Fluttertoast.showToast(msg: "Data saved successfully!");
         await fetchData(); // Fetch updated data
       } else {
+
         Fluttertoast.showToast(msg: jsonResponse.body);
         throw Exception(jsonResponse.body);
+
       }
     } catch (e) {
       Fluttertoast.showToast(msg: "Error: ${e.toString()}");

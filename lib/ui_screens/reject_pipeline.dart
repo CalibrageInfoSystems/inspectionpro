@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:inspectionpro/database/InspDatabaseHelper.dart';
 import 'package:inspectionpro/utils/styles.dart';
 import 'package:inspectionpro/widgets/custom_button.dart';
@@ -12,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import '../utils/api_config.dart';
+import '../utils/commonutils.dart';
 import 'home_screen.dart';
 
 // class RejectPipeline extends StatefulWidget {
@@ -222,7 +224,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
     showDialog(
       context: context,
       barrierDismissible: true,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) { // Store dialog context separately
         return Dialog(
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
@@ -249,22 +251,19 @@ class _RejectPipelineState extends State<RejectPipeline> {
               ),
               // Content with message
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                 child: Text(
-                  'Do you want add more deficiencies',
+                  'Do you want to add more deficiencies?',
                   style: CommonStyles.txStyF15CbFF6.copyWith(
                     fontSize: 22,
                     fontWeight: FontWeight.w200,
                   ),
-                  // style: TextStyle(fontSize: 22, fontWeight: FontWeight.w200),
                   textAlign: TextAlign.center,
                 ),
               ),
               // Buttons
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -272,71 +271,43 @@ class _RejectPipelineState extends State<RejectPipeline> {
                       child: CustomButton(
                         btnText: 'No',
                         backgroundColor: CommonStyles.colorBlue,
-                        onPressed: () {
-                          Navigator.pop(context);
-                          sendDataToCloud(widget.lineId);
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const HomeScreen()),
-                          );
+                        onPressed: () async {
+                          Navigator.pop(dialogContext); // Close dialog first
+
+                          await sendDataToCloud(widget.lineId); // Wait for data upload
+
+                          if (context.mounted) {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const HomeScreen(),
+                              ),
+                            );
+                          }
                         },
                         btnStyle: const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                     ),
-
                     const SizedBox(width: 25),
                     Expanded(
                       child: CustomButton(
                         btnText: 'Yes',
                         backgroundColor: CommonStyles.colorBlue,
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(dialogContext);
                           setState(() {
                             selectedDdUnitID = null;
                             selectedDdUnit = null;
                             selectedDdOperator = null;
                             selectedItems.clear();
                             selectedItemsdiff.clear();
-
+                            noteController.clear();
                             deficiencyCount = deficiencyCount + 1;
                           });
                         },
-                        btnStyle:
-                            const TextStyle(color: Colors.white, fontSize: 15),
+                        btnStyle: const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                     ),
-                    /* ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Close dialog
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: CommonStyles.colorBlue, // Blue background
-                        foregroundColor: Colors.white, // White text
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      child: Text('No', style: TextStyle(fontSize: 14)),
-                    ), */
-                    /* ElevatedButton(
-                      onPressed: () {
-                        // Handle "Yes" action here
-                        Navigator.of(context).pop();
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: CommonStyles.colorBlue, // Blue background
-                        foregroundColor: Colors.white, // White text
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                      ),
-                      child: Text('Yes', style: TextStyle(fontSize: 14)),
-                    ), */
                   ],
                 ),
               ),
@@ -771,14 +742,18 @@ class _RejectPipelineState extends State<RejectPipeline> {
             overflow: TextOverflow.ellipsis,
           ),
           items: [
-            const DropdownMenuItem<String>(
+             DropdownMenuItem<String>(
               value: '-1',
               enabled: false,
-              child: Text(
-                'Select Operator',
-                style: CommonStyles.txStyF15CbFF6,
-              ),
-            ),
+           child: Text(
+               'Select Operator',
+               style: CommonStyles.txStyF15CbFF6.copyWith(
+                 color: CommonStyles.colorGrey,
+               ),
+           ),
+             ),
+
+
             ...data.map(
               (Map<String, dynamic> value) => DropdownMenuItem<String>(
                 value: value['name'],
@@ -900,7 +875,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
   }
 
   Future<void> sendDataToCloud(String lineId) async {
-    bool networkAvailable = await isNetworkAvailable();
+    bool networkAvailable = await CommonUtils.isNetworkAvailable();
 
     final apiUrl = Uri.parse('$baseUrl$SaveLines');
     print("🌐 API URL: $apiUrl");
@@ -934,15 +909,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
     }
   }
 
-  Future<bool> isNetworkAvailable() async {
-    var connectivityResult = await Connectivity().checkConnectivity();
-    print("🔍 Connectivity Check: $connectivityResult"); // Debug log
 
-    bool hasInternet = await InternetConnectionChecker().hasConnection;
-    print("🌐 Actual Internet Connection: $hasInternet"); // Debug log
-
-    return hasInternet;
-  }
 
   void _showProgressBar(BuildContext context, String message) {
     showDialog(
@@ -1056,31 +1023,33 @@ class _RejectPipelineState extends State<RejectPipeline> {
   }
 
   // Function to show SnackBar with error message
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
+  // void _showErrorSnackBar(String message) {
+  //   ScaffoldMessenger.of(context).showSnackBar(
+  //     SnackBar(
+  //       content: Text(message),
+  //       backgroundColor: Colors.red,
+  //     ),
+  //   );
+  // }
+
+
 
   // Function to handle form submission
   void _handleSubmit() {
     if (!_validateUnit()) {
-      _showErrorSnackBar('Please select a unit.');
+      CommonUtils.showErrorToast(context,'Please select an unit.');
       return;
     }
     if (!_validateDeficiencyType()) {
-      _showErrorSnackBar('Please select at least one deficiency type.');
+      CommonUtils.showErrorToast(context,'Please select at least one deficiency type.');
       return;
     }
     if (!_validateOperator()) {
-      _showErrorSnackBar('Please select an operator.');
+      CommonUtils.showErrorToast(context,'Please select an operator.');
       return;
     }
     if (!_validateCorrectiveAction()) {
-      _showErrorSnackBar('Please select at least one corrective action.');
+      CommonUtils.showErrorToast(context,'Please select at least one corrective action.');
       return;
     }
     print("Note Entered: ${noteController.text}");

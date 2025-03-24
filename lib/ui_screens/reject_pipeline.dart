@@ -1,28 +1,16 @@
 import 'dart:convert';
 
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:inspectionpro/database/InspDatabaseHelper.dart';
 import 'package:inspectionpro/gen/assets.gen.dart';
 import 'package:inspectionpro/utils/styles.dart';
-import 'package:inspectionpro/widgets/custom_button.dart';
 import 'package:inspectionpro/widgets/custom_textfield.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:internet_connection_checker/internet_connection_checker.dart';
-import 'package:intl/intl.dart';
 import '../utils/api_config.dart';
 import '../utils/commonutils.dart';
 import 'home_screen.dart';
-
-// class RejectPipeline extends StatefulWidget {
-//   const RejectPipeline({super.key});
-//
-//   @override
-//   State<RejectPipeline> createState() => _RejectPipelineState();
-// }
 
 class RejectPipeline extends StatefulWidget {
   final String lineId;
@@ -31,7 +19,7 @@ class RejectPipeline extends StatefulWidget {
   const RejectPipeline({super.key, required this.lineId, required this.name});
 
   @override
-  _RejectPipelineState createState() => _RejectPipelineState();
+  State<RejectPipeline> createState() => _RejectPipelineState();
 }
 
 class _RejectPipelineState extends State<RejectPipeline> {
@@ -61,23 +49,6 @@ class _RejectPipelineState extends State<RejectPipeline> {
     futureLineValuesforAction = fetchLineValues(0);
     print("Received LineID: ${widget.lineId}, Name: ${widget.name}");
   }
-
-/*   Future<List<Future>> fetchFutureData() async {
-  try {
-    final dbHelper = InspDatabaseHelper();
-    final units = await dbHelper.getUnits();
-    final lines = await dbHelper.getLines();
-    final lineValues = await dbHelper.getLineValues();
-
-    return [
-      units ?? [],
-      lines ?? [],
-      lineValues ?? [],
-    ];
-  } catch (e) {
-    rethrow;
-  }
-} */
 
   Future<List<Map<String, dynamic>>> fetchUnits() async {
     try {
@@ -459,7 +430,6 @@ class _RejectPipelineState extends State<RejectPipeline> {
                     selectedDdUnit = value;
                   });
 
-                  // Find the selected unit in the list and print unitId & name
                   final selectedUnit = resultLines.firstWhere(
                     (unit) => unit['name'] == value,
                     orElse: () => {},

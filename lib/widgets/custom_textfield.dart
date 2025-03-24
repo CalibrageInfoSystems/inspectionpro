@@ -39,11 +39,13 @@ class CustomTextfield extends StatelessWidget {
       validator: validator,
       maxLines: maxLines,
       maxLength: maxLength,
+      style: CommonStyles.txStyF15CbFF5,
       decoration: InputDecoration(
           filled: filled,
+          counterText: '',
           fillColor: fillColor,
           hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.grey),
+          hintStyle: const TextStyle(color: CommonStyles.colorGrey),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(4),
             borderSide: const BorderSide(color: CommonStyles.colorGrey),

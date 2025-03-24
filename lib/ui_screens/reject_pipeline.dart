@@ -231,7 +231,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
           const Text(
             'Note',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -311,15 +311,23 @@ class _RejectPipelineState extends State<RejectPipeline> {
                                       .map((e) => e['name'])
                                       .join(', ')
                                   : 'Choose Corrective Action',
-                              style: TextStyle(
+                              style: CommonStyles.txStyF15CbFF5.copyWith(
+                                  color: selectedItems.isNotEmpty
+                                      ? Colors.black
+                                      : CommonStyles.colorGrey,
+                                  fontWeight: selectedItems.isNotEmpty
+                                      ? FontWeight.w500
+                                      : FontWeight.w400),
+                              /*  style: TextStyle(
                                   fontSize: 15,
                                   color: selectedItems.isNotEmpty
                                       ? Colors.black
-                                      : CommonStyles.colorGrey),
+                                      : CommonStyles.colorGrey), */
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const Icon(Icons.keyboard_arrow_down_rounded),
+                          const Icon(Icons.keyboard_arrow_down_rounded,
+                              color: CommonStyles.colorGrey),
                         ],
                       ),
                     ),
@@ -375,7 +383,10 @@ class _RejectPipelineState extends State<RejectPipeline> {
                   children: [
                     const Text(
                       'Deficiency Type',
-                        style: CommonStyles.txStyF15CbFF6
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Container(
@@ -397,15 +408,20 @@ class _RejectPipelineState extends State<RejectPipeline> {
                                       .map((e) => e['name'])
                                       .join(', ')
                                   : 'Choose Deficiency Type',
-                              style: TextStyle(
-                                  fontSize: 15,
+                              style: CommonStyles.txStyF15CbFF5.copyWith(
                                   color: selectedItemsdiff.isNotEmpty
                                       ? Colors.black
-                                      : CommonStyles.colorGrey),
+                                      : CommonStyles.colorGrey,
+                                  fontWeight: selectedItemsdiff.isNotEmpty
+                                      ? FontWeight.w500
+                                      : FontWeight.w400),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const Icon(Icons.keyboard_arrow_down_rounded),
+                          const Icon(
+                            Icons.keyboard_arrow_down_rounded,
+                            color: CommonStyles.colorGrey,
+                          ),
                         ],
                       ),
                     ),
@@ -477,11 +493,13 @@ class _RejectPipelineState extends State<RejectPipeline> {
         child: DropdownButton2<String>(
           iconStyleData: const IconStyleData(
             icon: Icon(Icons.keyboard_arrow_down_rounded),
+            iconEnabledColor: CommonStyles.colorGrey,
           ),
           isExpanded: true,
           hint: const Text(
             'Choose Unit ',
-            style: CommonStyles.txStyF15CbFF6,
+            style: CommonStyles.txStyF15CgFF4,
+            // style: TextStyle(fontSize: 15, color: CommonStyles.colorGrey),
             /* style: TextStyle(
               fontSize: 15,
               color: CommonStyles.colorGrey,
@@ -495,7 +513,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
               enabled: false,
               child: Text(
                 'Select Unit',
-                style: CommonStyles.txStyF15CbFF6.copyWith(
+                style: CommonStyles.txStyF15CbFF5.copyWith(
                   color: CommonStyles.colorGrey,
                 ),
               ),
@@ -505,7 +523,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
                 value: value['name'],
                 child: Text(
                   value['name'],
-                  style: CommonStyles.txStyF15CbFF6,
+                  style: CommonStyles.txStyF15CbFF5,
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -609,7 +627,10 @@ class _RejectPipelineState extends State<RejectPipeline> {
         children: [
           Text(
             title,
-              style: CommonStyles.txStyF15CbFF6
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 4),
           child,
@@ -632,23 +653,22 @@ class _RejectPipelineState extends State<RejectPipeline> {
             icon: Icon(
               Icons.keyboard_arrow_down_rounded,
             ),
+            iconEnabledColor: CommonStyles.colorGrey,
           ),
           isExpanded: true,
           hint: const Text(
             'Choose Operator',
-            style: CommonStyles.txStyF15CgFF6,
+            style: CommonStyles.txStyF15CgFF4,
             textAlign: TextAlign.center,
             overflow: TextOverflow.ellipsis,
           ),
           items: [
-            DropdownMenuItem<String>(
+            const DropdownMenuItem<String>(
               value: '-1',
               enabled: false,
               child: Text(
                 'Select Operator',
-                style: CommonStyles.txStyF15CbFF6.copyWith(
-                  color: CommonStyles.colorGrey,
-                ),
+                style: CommonStyles.txStyF15CgFF4,
               ),
             ),
             ...data.map(
@@ -656,7 +676,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
                 value: value['name'],
                 child: Text(
                   value['name'],
-                  style: CommonStyles.txStyF15CbFF6,
+                  style: CommonStyles.txStyF15CbFF5,
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -716,7 +736,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
                         ListTile(
                           title: Text(
                             hintText,
-                            style: CommonStyles.txStyF15CbFF6,
+                            style: CommonStyles.txStyF15CbFF5,
                           ),
                         ),
                         ...List.generate(result.length, (index) {

@@ -45,7 +45,8 @@ class CommonUtils {
     );
   }
 
-  static void showErrorToast(BuildContext context, String message, {bool isError = true}) {
+  static void showErrorToast(BuildContext context, String message,
+      {bool isError = true}) {
     FToast fToast = FToast();
     fToast.init(context);
 
@@ -59,7 +60,8 @@ class CommonUtils {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor, width: 2), // Border color changes
+        border:
+            Border.all(color: borderColor, width: 2), // Border color changes
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
@@ -68,15 +70,13 @@ class CommonUtils {
           ),
         ],
       ),
-      child:
-      Row(
+      child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(iconData, color: iconColor, size: 24), // Dynamic icon
           const SizedBox(width: 8),
           Expanded(
-
-            child:Text(
+            child: Text(
               message,
               textAlign: TextAlign.center, // Corrected placement
               style: const TextStyle(
@@ -133,7 +133,7 @@ class CommonUtils {
                 padding: const EdgeInsets.only(top: 10),
                 child: Text(
                   title,
-                  style: CommonStyles.txStyF15CbFF6.copyWith(
+                  style: CommonStyles.txStyF15CbFF5.copyWith(
                     fontSize: 22,
                     color: CommonStyles.colorBlue,
                   ),
@@ -147,7 +147,7 @@ class CommonUtils {
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                 child: Text(
                   '$content',
-                  style: CommonStyles.txStyF15CbFF6.copyWith(
+                  style: CommonStyles.txStyF15CbFF5.copyWith(
                     fontSize: 20,
                     fontWeight: FontWeight.w400,
                   ),

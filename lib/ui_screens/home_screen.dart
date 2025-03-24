@@ -13,6 +13,7 @@ import 'package:inspectionpro/utils/styles.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../database/InspDatabaseHelper.dart';
 import '../gen/assets.gen.dart';
@@ -41,54 +42,101 @@ class _HomeScreenState extends State<HomeScreen> {
   bool showFailedOnly = false; // Toggle between All and Failed data
   String userName = "";
   String applicationName = "";
-  @override
+
+  late Future<Map<String, List<Map<String, dynamic>>>> futureData;
+
+  List<Map<String, dynamic>> sampleFetchedLines = [
+    {
+      "_id": 311,
+      "appId": "14f5483f-56dd-405e-bae3-57fa72888838",
+      "lineId": "d461d4e7-116f-4980-9256-5813d9290463",
+      "name": "Phyche Line",
+      "frequency": "0",
+      "window": 0,
+      "lastExecuted": "2025-03-24T05:35:02.502+00:00",
+      "closed": 1,
+      "status": 1
+    },
+    {
+      "_id": 312,
+      "appId": "14f5483f-56dd-405e-bae3-57fa72888838",
+      "lineId": "9a3e62d9-97ef-4789-805d-b8ea52ad9e25",
+      "name": "Whett Line",
+      "frequency": "0",
+      "window": 0,
+      "lastExecuted": "2025-03-22T05:59:08.095+00:00",
+      "closed": 1,
+      "status": 1
+    },
+    {
+      "_id": 313,
+      "appId": "14f5483f-56dd-405e-bae3-57fa72888838",
+      "lineId": "b25fc3f3-8c7a-4416-9fa5-c4044db68248",
+      "name": "Dry Line",
+      "frequency": "0",
+      "window": 0,
+      "lastExecuted": "2025-03-21T11:05:03.649+00:00",
+      "closed": 1,
+      "status": 1
+    },
+    {
+      "_id": 314,
+      "appId": "14f5483f-56dd-405e-bae3-57fa72888838",
+      "lineId": "64098c8a-aad9-41eb-b7e8-fb8be4b6c1ae",
+      "name": "Clothes Line",
+      "frequency": "4",
+      "window": 5,
+      "lastExecuted": "2025-03-22T05:58:46.611+00:00",
+      "closed": 1,
+      "status": 1
+    }
+  ];
+
   @override
   void initState() {
     super.initState();
-    _initialize();
+    futureData = getData();
   }
 
-  void _initialize() async {
-    _loadUserData();
-
+/*   void _initialize() async {
     bool networkAvailable = await CommonUtils.isNetworkAvailable();
 
     if (networkAvailable) {
-      getAppInfo();
+      futureData = getAppInfo();
     } else {
-      fetchData();
+      futureData = fetchData();
+    }
+  } */
 
-      //  debugPrint("Fetching data from database");
-      //
-      //  final dbHelper = InspDatabaseHelper();
-      //
-      //  await Future.delayed(Duration.zero, () async {
-      //    await dbHelper.clearTable('lines');
-      //
-      //
-      //
-      // linesData = await dbHelper.getLines();
-      //
-      //    for (var line in linesData) {
-      //      if (!line.status) {
-      //     failedLinesData.add(line);
-      //      }
-      //    }
-      //
-      //
-      //    debugPrint("check size... ${linesData.length}");
+  Future<Map<String, List<Map<String, dynamic>>>> getData() async {
+    try {
+      bool networkAvailable = await CommonUtils.isNetworkAvailable();
 
-      // Delay toast until after the first frame to avoid context issues
+      if (networkAvailable) {
+        final apiUrl = Uri.parse('$baseUrl$getLines');
+        final jsonResponse = await http.get(apiUrl);
+        if (jsonResponse.statusCode == 200) {
+          Map<String, dynamic> data = jsonDecode(jsonResponse.body);
+          final dbHelper = InspDatabaseHelper();
 
-      //  });
+          await dbHelper.insertLines(data['lines']);
+          await dbHelper.insertLineValues(data['values']);
+          await dbHelper.insertOperators(data['operators']);
+
+          return await fetchData();
+        } else {
+          Fluttertoast.showToast(msg: jsonResponse.body);
+          throw Exception(jsonResponse.body);
+        }
+      } else {
+        return await fetchData();
+      }
+    } catch (e) {
+      rethrow;
     }
   }
 
-  Future<void> getAppInfo() async {
-    setState(() {
-      isLoading = true; // Start loading
-    });
-
+  Future<Map<String, List<Map<String, dynamic>>>> getAppInfo() async {
     try {
       final apiUrl = Uri.parse('$baseUrl$getLines');
       final jsonResponse = await http.get(apiUrl);
@@ -101,18 +149,14 @@ class _HomeScreenState extends State<HomeScreen> {
         await dbHelper.insertLineValues(data['values']);
         await dbHelper.insertOperators(data['operators']);
 
-     //   Fluttertoast.showToast(msg: "Data saved successfully!");
-        await fetchData(); // Fetch updated data
+        return fetchData();
       } else {
         Fluttertoast.showToast(msg: jsonResponse.body);
         throw Exception(jsonResponse.body);
       }
     } catch (e) {
       Fluttertoast.showToast(msg: "Error: ${e.toString()}");
-    } finally {
-      setState(() {
-        isLoading = false; // Stop loading when done
-      });
+      rethrow;
     }
   }
 
@@ -177,69 +221,94 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: Container(
-        color: const Color(0xFFF5F5F5),
-        child: Column(
-          children: [
-            Container(
-              alignment: Alignment.centerRight,
-              color: const Color.fromARGB(255, 153, 153, 153),
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                'FACILITY: $applicationName / USER: $userName',
-                style: const TextStyle(fontSize: 16),
-              ),
+      body: FutureBuilder(
+          future: futureData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // return const Center(child: CircularProgressIndicator());
+              return Skeletonizer(
+                enabled: true,
+                child: homeScreenTemplate([], sampleFetchedLines),
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+
+            Map<String, List<Map<String, dynamic>>> data = snapshot.data!;
+            if (data.isEmpty) {
+              return const Center(child: Text("No data found"));
+            }
+
+            List<Map<String, dynamic>> lines = data['lines']!;
+            List<Map<String, dynamic>> failedLinesData = data['failedLines']!;
+
+            return homeScreenTemplate(lines, failedLinesData);
+          }),
+    );
+  }
+
+  Container homeScreenTemplate(List<Map<String, dynamic>> lines,
+      List<Map<String, dynamic>> failedLinesData) {
+    return Container(
+      color: const Color(0xFFF5F5F5),
+      child: Column(
+        children: [
+          Container(
+            alignment: Alignment.centerRight,
+            color: const Color.fromARGB(255, 153, 153, 153),
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'FACILITY: $applicationName / USER: $userName',
+              style: const TextStyle(fontSize: 16),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => showFailedOnly = false),
-                      child: _buildTab('All : ${lines.length}', Colors.grey),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => showFailedOnly = false),
+                    child: _buildTab('All : ${lines.length}', Colors.grey),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: _buildTab('Unsaved : 0', Colors.blue),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() => showFailedOnly = true),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: _buildTab(
+                          'Failed : ${failedLinesData.length}', Colors.red),
                     ),
                   ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: _buildTab('Unsaved : 0', Colors.blue),
-                  ),
-                  const SizedBox(width: 5),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => setState(() => showFailedOnly = true),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: _buildTab(
-                            'Failed : ${failedLinesData.length}', Colors.red),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : (showFailedOnly ? failedLinesData : lines).isEmpty
+                    ? const Center(child: Text("No data found"))
+                    : ListView.builder(
+                        itemCount: showFailedOnly
+                            ? failedLinesData.length
+                            : lines.length,
+                        itemBuilder: (context, index) {
+                          final item = showFailedOnly
+                              ? failedLinesData[index]
+                              : lines[index];
+                          return buildItem(item);
+                        },
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: isLoading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator()) // Show loader while data loads
-                  : (showFailedOnly ? failedLinesData : lines).isEmpty
-                      ? const Center(child: Text("No data found"))
-                      : ListView.builder(
-                          itemCount: showFailedOnly
-                              ? failedLinesData.length
-                              : lines.length,
-                          itemBuilder: (context, index) {
-                            final item = showFailedOnly
-                                ? failedLinesData[index]
-                                : lines[index];
-                            return buildItem(item); // Pass data to `buildItem`
-                          },
-                        ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -263,7 +332,6 @@ class _HomeScreenState extends State<HomeScreen> {
   /// **UI for Each Line Item**
   Widget buildItem(Map<String, dynamic> line) {
     String formattedDate = getProperDate(line['lastExecuted']);
-    print('formattedDate: $formattedDate');
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: const BoxDecoration(
@@ -271,9 +339,6 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Row(
         children: [
-          //  String dateTimeString = "2025-03-17T12:49:00.05+00:00"; // Example ISO 8601 format
-
-          /// **Line Name & Last Executed Time**
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -354,50 +419,27 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Fetch Data from SQLite
-  ///
-  Future<void> fetchData() async {
-    setState(() {
-      isLoading = true; // Start loading
-    });
+  Future<Map<String, List<Map<String, dynamic>>>> fetchData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userName = prefs.getString('UserName') ?? 'Guest';
+    applicationName = prefs.getString('ApplicationName') ?? 'UnknownApp';
     final dbHelper = InspDatabaseHelper();
 
     List<Map<String, dynamic>> fetchedLines = await dbHelper.getLines();
-    // ..  List<Map<String, dynamic>> fetchedUnits = await dbHelper.getUnits();
-    //   List<Map<String, dynamic>> fetchedLineValues = await dbHelper.getLineValues();
 
     List<Map<String, dynamic>> failedLines = fetchedLines.where((line) {
-      return line['status'] == 0; // Assuming 'status' is a boolean
+      return line['status'] == 0;
     }).toList();
 
-    setState(() {
-      lines = fetchedLines;
-      // units = fetchedUnits;
-      //   lineValues = fetchedLineValues;
-      failedLinesData = failedLines;
-      isLoading = false; // Data loaded, hide loader
-    });
+    print('SharedPreferences1: ${jsonEncode(failedLines)}');
+
+    print('SharedPreferences2:  ${jsonEncode(fetchedLines)}');
+
+    return {
+      "lines": fetchedLines,
+      "failedLines": failedLines,
+    };
   }
-//   Future<void> fetchData() async {
-//     final dbHelper = InspDatabaseHelper();
-//
-//     List<Map<String, dynamic>> fetchedLines = await dbHelper.getLines();
-//     List<Map<String, dynamic>> fetchedUnits = await dbHelper.getUnits();
-//     List<Map<String, dynamic>> fetchedLineValues = await dbHelper.getLineValues();
-//
-//     // Filtering failed lines
-//     List<Map<String, dynamic>> failedLines = fetchedLines.where((line) {
-//       return line['status'] == 0; // Assuming 'status' is a boolean
-//     }).toList();
-// print('failedLines: $failedLines');
-//     print('failedLines.length: ${failedLinesData.length}');
-//     setState(() {
-//       lines = fetchedLines;
-//       units = fetchedUnits;
-//       lineValues = fetchedLineValues;
-//       failedLinesData = failedLines; // Store failed lines
-//     });
-//   }
 
   void logOutDialog(BuildContext context) {
     showDialog(
@@ -659,7 +701,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
       //   _hideProgressBar(context);
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        CommonUtils.showErrorToast(context,   success ? "Sync successful" : "Sync failed. Please try again.",isError: false);
+        CommonUtils.showErrorToast(context,
+            success ? "Sync successful" : "Sync failed. Please try again.",
+            isError: false);
       });
       // ScaffoldMessenger.of(context).showSnackBar(
       //   SnackBar(
@@ -669,7 +713,9 @@ class _HomeScreenState extends State<HomeScreen> {
       // );
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        CommonUtils.showErrorToast(context, "Please check internet connection",isError: true);;
+        CommonUtils.showErrorToast(context, "Please check internet connection",
+            isError: true);
+        ;
       });
     }
   }

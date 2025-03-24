@@ -39,7 +39,8 @@ class _LoginScreenState extends State<LoginScreen> {
       bool isConnected = await CommonUtils.checkInternetConnectivity();
       if (!isConnected) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          CommonUtils.showErrorToast(context, "Please check internet connection");
+          CommonUtils.showErrorToast(
+              context, "Please check internet connection");
         });
       }
 
@@ -59,11 +60,11 @@ class _LoginScreenState extends State<LoginScreen> {
         body: requestBody,
       );
 
+      SharedPreferences prefs = await SharedPreferences.getInstance();
       Navigator.of(context).pop();
       if (jsonResponse.statusCode == 200) {
         Map<String, dynamic> responseData = jsonDecode(jsonResponse.body);
 
-        SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
         await prefs.setString('UserName', responseData['UserName']);
         await prefs.setString(
@@ -228,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
           //   context,
           //   MaterialPageRoute(builder: (context) => const HomeScreen()),
           // );
-     if (formKey.currentState!.validate()) {
+          if (formKey.currentState!.validate()) {
             CommonUtils.showLoadingDialog(context);
             signin();
           }

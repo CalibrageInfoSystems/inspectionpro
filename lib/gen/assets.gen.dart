@@ -16,9 +16,16 @@ class $AssetsImagesGen {
   AssetGenImage get appLogo512 =>
       const AssetGenImage('assets/images/app_logo_512.png');
 
+  /// File path: assets/images/inspection_pro_splash.PNG
+  AssetGenImage get inspectionProSplash =>
+      const AssetGenImage('assets/images/inspection_pro_splash.PNG');
+
   /// File path: assets/images/inspectionpro_title_caption.png
   AssetGenImage get inspectionproTitleCaption =>
       const AssetGenImage('assets/images/inspectionpro_title_caption.png');
+
+  /// File path: assets/images/ip_logo.PNG
+  AssetGenImage get ipLogo => const AssetGenImage('assets/images/ip_logo.PNG');
 
   /// File path: assets/images/logout.png
   AssetGenImage get logout => const AssetGenImage('assets/images/logout.png');
@@ -31,8 +38,15 @@ class $AssetsImagesGen {
   AssetGenImage get sync => const AssetGenImage('assets/images/sync.png');
 
   /// List of all assets
-  List<AssetGenImage> get values =>
-      [appLogo512, inspectionproTitleCaption, logout, mainLogo, sync];
+  List<AssetGenImage> get values => [
+        appLogo512,
+        inspectionProSplash,
+        inspectionproTitleCaption,
+        ipLogo,
+        logout,
+        mainLogo,
+        sync
+      ];
 }
 
 class Assets {

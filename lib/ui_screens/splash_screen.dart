@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
         padding: const EdgeInsets.all(10.0),
         child: Center(
           child: Image.asset(
-            Assets.images.inspectionproTitleCaption.path,
+            Assets.images.inspectionProSplash.path,
             width: double.infinity,
             fit: BoxFit.contain,
           ),

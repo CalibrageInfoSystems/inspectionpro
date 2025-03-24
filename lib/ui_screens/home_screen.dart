@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             /// **App Logo from Assets**
             Image.asset(
-              'assets/images/app_logo_512.png',
+              Assets.images.ipLogo.path,
               width: 40,
               height: 40,
             ),

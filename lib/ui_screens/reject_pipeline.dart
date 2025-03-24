@@ -135,7 +135,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
           children: [
             /// **App Logo from Assets**
             Image.asset(
-              Assets.images.appLogo512.path,
+              Assets.images.ipLogo.path,
               width: 40,
               height: 40,
             ),
@@ -375,10 +375,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
                   children: [
                     const Text(
                       'Deficiency Type',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                        style: CommonStyles.txStyF15CbFF6
                     ),
                     const SizedBox(height: 4),
                     Container(
@@ -484,7 +481,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
           isExpanded: true,
           hint: const Text(
             'Choose Unit ',
-            style: CommonStyles.txStyF15CgFF6,
+            style: CommonStyles.txStyF15CbFF6,
             /* style: TextStyle(
               fontSize: 15,
               color: CommonStyles.colorGrey,
@@ -612,10 +609,7 @@ class _RejectPipelineState extends State<RejectPipeline> {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+              style: CommonStyles.txStyF15CbFF6
           ),
           const SizedBox(height: 4),
           child,

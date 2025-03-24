@@ -228,7 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
               // return const Center(child: CircularProgressIndicator());
               return Skeletonizer(
                 enabled: true,
-                child: homeScreenTemplate([], sampleFetchedLines),
+                child: homeScreenTemplate([], []),
               );
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
